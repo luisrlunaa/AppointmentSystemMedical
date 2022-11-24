@@ -191,7 +191,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new CoberturaDTO(
                             temp.Cobertura.Id,
                             new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.Id,
+                                temp.Cobertura.ObraSocial.ObraSocialId,
                                 temp.Cobertura.ObraSocial.Nombre,
                                 temp.Cobertura.ObraSocial.Estado),
                             temp.Cobertura.Descripcion,
@@ -256,7 +256,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new CoberturaDTO(
                             temp.Cobertura.Id,
                             new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.Id,
+                                temp.Cobertura.ObraSocial.ObraSocialId,
                                 temp.Cobertura.ObraSocial.Nombre,
                                 temp.Cobertura.ObraSocial.Estado),
                             temp.Cobertura.Descripcion,
@@ -323,7 +323,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new CoberturaDTO(
                             temp.Cobertura.Id,
                             new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.Id,
+                                temp.Cobertura.ObraSocial.ObraSocialId,
                                 temp.Cobertura.ObraSocial.Nombre,
                                 temp.Cobertura.ObraSocial.Estado),
                             temp.Cobertura.Descripcion,
@@ -391,7 +391,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new CoberturaDTO(
                             temp.Cobertura.Id,
                             new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.Id,
+                                temp.Cobertura.ObraSocial.ObraSocialId,
                                 temp.Cobertura.ObraSocial.Nombre,
                                 temp.Cobertura.ObraSocial.Estado),
                             temp.Cobertura.Descripcion,
@@ -459,7 +459,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new CoberturaDTO(
                             temp.Cobertura.Id,
                             new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.Id,
+                                temp.Cobertura.ObraSocial.ObraSocialId,
                                 temp.Cobertura.ObraSocial.Nombre,
                                 temp.Cobertura.ObraSocial.Estado),
                             temp.Cobertura.Descripcion,
@@ -529,7 +529,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new CoberturaDTO(
                             temp.Cobertura.Id,
                             new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.Id,
+                                temp.Cobertura.ObraSocial.ObraSocialId,
                                 temp.Cobertura.ObraSocial.Nombre,
                                 temp.Cobertura.ObraSocial.Estado),
                             temp.Cobertura.Descripcion,
@@ -596,7 +596,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new CoberturaDTO(
                             temp.Cobertura.Id,
                             new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.Id,
+                                temp.Cobertura.ObraSocial.ObraSocialId,
                                 temp.Cobertura.ObraSocial.Nombre,
                                 temp.Cobertura.ObraSocial.Estado),
                             temp.Cobertura.Descripcion,
@@ -665,7 +665,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new CoberturaDTO(
                             temp.Cobertura.Id,
                             new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.Id,
+                                temp.Cobertura.ObraSocial.ObraSocialId,
                                 temp.Cobertura.ObraSocial.Nombre,
                                 temp.Cobertura.ObraSocial.Estado),
                             temp.Cobertura.Descripcion,
@@ -731,7 +731,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new CoberturaDTO(
                             temp.Cobertura.Id,
                             new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.Id,
+                                temp.Cobertura.ObraSocial.ObraSocialId,
                                 temp.Cobertura.ObraSocial.Nombre,
                                 temp.Cobertura.ObraSocial.Estado),
                             temp.Cobertura.Descripcion,
@@ -799,7 +799,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new CoberturaDTO(
                             temp.Cobertura.Id,
                             new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.Id,
+                                temp.Cobertura.ObraSocial.ObraSocialId,
                                 temp.Cobertura.ObraSocial.Nombre,
                                 temp.Cobertura.ObraSocial.Estado),
                             temp.Cobertura.Descripcion,
@@ -865,7 +865,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new CoberturaDTO(
                             temp.Cobertura.Id,
                             new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.Id,
+                                temp.Cobertura.ObraSocial.ObraSocialId,
                                 temp.Cobertura.ObraSocial.Nombre,
                                 temp.Cobertura.ObraSocial.Estado),
                             temp.Cobertura.Descripcion,
@@ -933,7 +933,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new CoberturaDTO(
                             temp.Cobertura.Id,
                             new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.Id,
+                                temp.Cobertura.ObraSocial.ObraSocialId,
                                 temp.Cobertura.ObraSocial.Nombre,
                                 temp.Cobertura.ObraSocial.Estado),
                             temp.Cobertura.Descripcion,

@@ -10,7 +10,7 @@ namespace AppointmentSystemMedical.Model.Entities
             this.Cobertura = new HashSet<Cobertura>();
         }
 
-        public int Id { get; set; }
+        public int ObraSocialId { get; set; }
         public string Nombre { get; set; }
         public Nullable<bool> Estado { get; set; }
 

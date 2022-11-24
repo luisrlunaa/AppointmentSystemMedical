@@ -1,118 +1,153 @@
-﻿using AppointmentSystemMedical.Model.DTOs;
+﻿using AppointmentSystemMedical.Infrastucture.Contexts;
+using AppointmentSystemMedical.Model.DTOs;
 using AppointmentSystemMedical.Model.Entities;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 
 namespace AppointmentSystemMedical.CapaDatos
 {
     public class CoberturaDAL
     {
-        public static List<CoberturaDTO> Buscar()
+        DataManager Data = new DataManager();
+        public (List<CoberturaDTO>result, string message) Buscar()
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            List<CoberturaDTO> res = new List<CoberturaDTO>();
+            try
             {
-                List<CoberturaDTO> res = new List<CoberturaDTO>();
-                var query = db.Cobertura
-                    .OrderBy(el => el.ObraSocial.Nombre)
-                    .ThenBy(el => el.Descripcion);
-                foreach (Cobertura temp in query)
+                var join = Data.JoinExpression("INNER", new List<string>() { "Cobertura" }, new List<string>() { "ObraSocial" }, new List<string>() { "ObraSocialId" });
+                var classKeys = Data.GetObjectKeys(new Cobertura());
+                var sql = Data.SelectExpression("Cobertura", classKeys, JoinExp: join);
+                var (dtPC, message) = Data.GetList(sql, "CoberturaDAL.Buscar");
+                if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
+                    return (res, message);
+
+                foreach (DataRow temp in dtPC.Rows)
                 {
                     res.Add(new CoberturaDTO(
-                        temp.Id,
-                        new ObraSocialDTO(
-                            temp.ObraSocial.Id,
-                            temp.ObraSocial.Nombre,
-                            temp.ObraSocial.Estado),
-                        temp.Descripcion,
-                        temp.Estado));
+                                temp["Cobertura.Id"] == DBNull.Value ? 0 : Convert.ToInt32(temp["Cobertura.Id"]),
+                                new ObraSocialDTO(
+                                    temp["ObraSocial.Id"] == DBNull.Value ? 0 : Convert.ToInt32(temp["ObraSocial.Id"]),
+                                    temp["ObraSocial.Nombre"] == DBNull.Value ? string.Empty : Convert.ToString(temp["ObraSocial.Nombre"]),
+                                    temp["ObraSocial.Estado"] == DBNull.Value ? false : Convert.ToBoolean(temp["ObraSocial.Estado"])),
+                                temp["Cobertura.Descripcion"] == DBNull.Value ? string.Empty : Convert.ToString(temp["Cobertura.Descripcion"]),
+                                temp["Cobertura.Estado"] == DBNull.Value ? false : Convert.ToBoolean(temp["Cobertura.Estado"])));
                 }
-                return res;
+
+                return (res, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (res, "Error al Cargar Data, Metodo CoberturaDAL.Buscar \n" + ex.Message.ToString());
             }
         }
 
-        public static CoberturaDTO Buscar(int id)
+        public (CoberturaDTO result, string message) Buscar(int id)
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            var s = new CoberturaDTO(0, new ObraSocialDTO(string.Empty, false),string.Empty,false);
+            try
             {
-                var query = db.Cobertura
-                    .Where(el => el.Id == id)
-                    .First();
-                return new CoberturaDTO(
-                    query.Id,
-                    new ObraSocialDTO(
-                        query.ObraSocial.Id,
-                        query.ObraSocial.Nombre,
-                        query.ObraSocial.Estado),
-                    query.Descripcion,
-                    query.Estado);
+                if (id <= 0)
+                    return (s, "Error Input Invalido, Metodo ClientsRepository.GetClientsByDocumentNo");
+
+                var join = Data.JoinExpression("INNER", new List<string>() { "Cobertura" }, new List<string>() { "ObraSocial" }, new List<string>() { "ObraSocialId" });
+                var classKeys = Data.GetObjectKeys(new Cobertura());
+                var sql = Data.SelectExpression("Cobertura", classKeys, WhereExpresion: " WHERE Id ='" + id + "'");
+                var (dr, message1) = Data.GetOne(sql, "CoberturaDAL.BuscarById");
+                if (dr is null)
+                    return (s, message1);
+
+                s.Id = dr["Cobertura.Id"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("Cobertura.Id")) : 0;
+                s.ObraSocial = new ObraSocialDTO(
+                       dr.GetInt32(dr.GetOrdinal("ObraSocial.Id")) == 0 ? 0 : dr.GetInt32(dr.GetOrdinal("ObraSocial.Id")),
+                       dr.GetString(dr.GetOrdinal("ObraSocial.Nombre")),
+                       dr.GetBoolean(dr.GetOrdinal("ObraSocial.Estado")));
+                s.Descripcion = dr["Cobertura.Descripcion"].GetType() != typeof(DBNull) ? dr.GetString(dr.GetOrdinal("Cobertura.Descripcion")) : string.Empty;
+                s.Estado = dr["Cobertura.Estado"].GetType() != typeof(DBNull) ? dr.GetBoolean(dr.GetOrdinal("Cobertura.Estado")) : false;
+
+                return (s, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (s, "Error al Cargar Data, Metodo CoberturaDAL.BuscarById \n" + ex.Message.ToString());
             }
         }
 
-        public static List<CoberturaDTO> Buscar(string apenom)
+        public (List<CoberturaDTO> result, string message) Buscar(string apenom)
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            List<CoberturaDTO> res = new List<CoberturaDTO>();
+            try
             {
-                List<CoberturaDTO> res = new List<CoberturaDTO>();
-                var query = db.Cobertura
-                    .Where(el => el.ObraSocial.Nombre.Contains(apenom) || el.Descripcion.Contains(apenom))
-                    .OrderBy(el => el.ObraSocial.Nombre)
-                    .ThenBy(el => el.Descripcion);
-                foreach (Cobertura temp in query)
+                var join = Data.JoinExpression("INNER", new List<string>() { "Cobertura" }, new List<string>() { "ObraSocial" }, new List<string>() { "ObraSocialId" });
+                var classKeys = Data.GetObjectKeys(new Cobertura());
+                var sql = Data.SelectExpression("Cobertura", classKeys, JoinExp: join, WhereExpresion: "Where ObraSocial.Nombre Like '"+apenom+ "' AND Cobertura.Descripcion Like '" + apenom+"'");
+                var (dtPC, message) = Data.GetList(sql, "CoberturaDAL.BuscarByDescripcion");
+                if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
+                    return (res, message);
+
+                foreach (DataRow temp in dtPC.Rows)
                 {
                     res.Add(new CoberturaDTO(
-                        temp.Id,
-                        new ObraSocialDTO(
-                            temp.ObraSocial.Id,
-                            temp.ObraSocial.Nombre,
-                            temp.ObraSocial.Estado),
-                        temp.Descripcion,
-                        temp.Estado));
+                                temp["Cobertura.Id"] == DBNull.Value ? 0 : Convert.ToInt32(temp["Cobertura.Id"]),
+                                new ObraSocialDTO(
+                                    temp["ObraSocial.Id"] == DBNull.Value ? 0 : Convert.ToInt32(temp["ObraSocial.Id"]),
+                                    temp["ObraSocial.Nombre"] == DBNull.Value ? string.Empty : Convert.ToString(temp["ObraSocial.Nombre"]),
+                                    temp["ObraSocial.Estado"] == DBNull.Value ? false : Convert.ToBoolean(temp["ObraSocial.Estado"])),
+                                temp["Cobertura.Descripcion"] == DBNull.Value ? string.Empty : Convert.ToString(temp["Cobertura.Descripcion"]),
+                                temp["Cobertura.Estado"] == DBNull.Value ? false : Convert.ToBoolean(temp["Cobertura.Estado"])));
                 }
-                return res;
+
+                return (res, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (res, "Error al Cargar Data, Metodo CoberturaDAL.BuscarByDescripcion \n" + ex.Message.ToString());
             }
         }
 
-        public static bool Guardar(CoberturaDTO cob)
+        public (bool result, string message) Guardar(CoberturaDTO input)
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            try
             {
-                Cobertura nuevo = new Cobertura();
-                nuevo.ObraSocialId = cob.ObraSocial.Id;
-                nuevo.Descripcion = cob.Descripcion;
-                nuevo.Estado = cob.Estado;
-                try
-                {
-                    db.Cobertura.Add(nuevo);
-                    db.SaveChanges();
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
+                if (input == null || input.Id == 0)
+                    return (false, "Error Input Invalido, Metodo CoberturaDAL.Guardar");
+
+                var parameters = new List<string> { "'" + input.ObraSocial.Id + "'", "'" + input.Descripcion + "'", "'" + input.Estado + "'"};
+                var classKeys = Data.GetObjectKeys(new Cobertura()).Where(x => x != "Id").ToList();
+                var sql = Data.InsertExpression("Cobertura", classKeys, parameters);
+                var (response, message) = Data.CrudAction(sql, "CoberturaDAL.Guardar");
+                if (!response)
+                    return (response, message);
+
+                return (response, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (false, "Error al Cargar Data, Metodo CoberturaDAL.Guardar \n" + ex.Message.ToString());
             }
         }
 
-        public static bool Editar(CoberturaDTO cob)
+        public (bool result, string message) Editar(CoberturaDTO input)
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            try
             {
-                Cobertura modificado = db.Cobertura
-                    .Where(el => el.Id == cob.Id)
-                    .First();
-                modificado.ObraSocialId = cob.ObraSocial.Id;
-                modificado.Descripcion = cob.Descripcion;
-                modificado.Estado = cob.Estado;
-                try
-                {
-                    db.Entry(modificado).State = EntityState.Modified;
-                    db.SaveChanges();
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
+                if (input == null || input.Id == 0)
+                    return (false, "Error Input Invalido, Metodo CoberturaDAL.Guardar");
+
+                var parameters = new List<string> { "'" + input.Descripcion + "'", "'" + input.Estado + "'" };
+                var classKeys = Data.GetObjectKeys(new Cobertura()).Where(x=>x != "Id" && x != "ObraSocialId").ToList();
+                var sql = Data.UpdateExpression("Cobertura", classKeys, parameters, " WHERE Id = '" + input.ObraSocial.Id + "'");
+                var (response, message) = Data.CrudAction(sql, "CoberturaDAL.Editar");
+                if (!response)
+                    return (response, message);
+
+                return (response, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (false, "Error al Cargar Data, Metodo CoberturaDAL.Editar \n" + ex.Message.ToString());
             }
         }
     }
