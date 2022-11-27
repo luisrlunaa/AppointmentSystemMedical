@@ -5,14 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Runtime.ConstrainedExecution;
 
 namespace AppointmentSystemMedical.CapaDatos
 {
     public class CoberturaDAL
     {
         DataManager Data = new DataManager();
-        public (List<CoberturaDTO>result, string message) Buscar()
+        public (List<CoberturaDTO> result, string message) Buscar()
         {
             List<CoberturaDTO> res = new List<CoberturaDTO>();
             try
@@ -46,11 +45,11 @@ namespace AppointmentSystemMedical.CapaDatos
 
         public (CoberturaDTO result, string message) Buscar(int id)
         {
-            var s = new CoberturaDTO(0, new ObraSocialDTO(string.Empty, false),string.Empty,false);
+            var s = new CoberturaDTO(0, new ObraSocialDTO(string.Empty, false), string.Empty, false);
             try
             {
                 if (id <= 0)
-                    return (s, "Error Input Invalido, Metodo ClientsRepository.GetClientsByDocumentNo");
+                    return (s, "Error Input Invalido, Metodo CoberturaDAL.BuscarById");
 
                 var join = Data.JoinExpression("INNER", new List<string>() { "Cobertura" }, new List<string>() { "ObraSocial" }, new List<string>() { "ObraSocialId" });
                 var classKeys = Data.GetObjectKeys(new Cobertura());
@@ -82,7 +81,7 @@ namespace AppointmentSystemMedical.CapaDatos
             {
                 var join = Data.JoinExpression("INNER", new List<string>() { "Cobertura" }, new List<string>() { "ObraSocial" }, new List<string>() { "ObraSocialId" });
                 var classKeys = Data.GetObjectKeys(new Cobertura());
-                var sql = Data.SelectExpression("Cobertura", classKeys, JoinExp: join, WhereExpresion: "Where ObraSocial.Nombre Like '"+apenom+ "' AND Cobertura.Descripcion Like '" + apenom+"'");
+                var sql = Data.SelectExpression("Cobertura", classKeys, JoinExp: join, WhereExpresion: "Where ObraSocial.Nombre Like '" + apenom + "' AND Cobertura.Descripcion Like '" + apenom + "'");
                 var (dtPC, message) = Data.GetList(sql, "CoberturaDAL.BuscarByDescripcion");
                 if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
                     return (res, message);
@@ -114,7 +113,7 @@ namespace AppointmentSystemMedical.CapaDatos
                 if (input == null || input.Id == 0)
                     return (false, "Error Input Invalido, Metodo CoberturaDAL.Guardar");
 
-                var parameters = new List<string> { "'" + input.ObraSocial.Id + "'", "'" + input.Descripcion + "'", "'" + input.Estado + "'"};
+                var parameters = new List<string> { "'" + input.ObraSocial.Id + "'", "'" + input.Descripcion + "'", "'" + input.Estado + "'" };
                 var classKeys = Data.GetObjectKeys(new Cobertura()).Where(x => x != "Id").ToList();
                 var sql = Data.InsertExpression("Cobertura", classKeys, parameters);
                 var (response, message) = Data.CrudAction(sql, "CoberturaDAL.Guardar");
@@ -134,10 +133,10 @@ namespace AppointmentSystemMedical.CapaDatos
             try
             {
                 if (input == null || input.Id == 0)
-                    return (false, "Error Input Invalido, Metodo CoberturaDAL.Guardar");
+                    return (false, "Error Input Invalido, Metodo CoberturaDAL.Editar");
 
                 var parameters = new List<string> { "'" + input.Descripcion + "'", "'" + input.Estado + "'" };
-                var classKeys = Data.GetObjectKeys(new Cobertura()).Where(x=>x != "Id" && x != "ObraSocialId").ToList();
+                var classKeys = Data.GetObjectKeys(new Cobertura()).Where(x => x != "Id" && x != "ObraSocialId").ToList();
                 var sql = Data.UpdateExpression("Cobertura", classKeys, parameters, " WHERE Id = '" + input.ObraSocial.Id + "'");
                 var (response, message) = Data.CrudAction(sql, "CoberturaDAL.Editar");
                 if (!response)

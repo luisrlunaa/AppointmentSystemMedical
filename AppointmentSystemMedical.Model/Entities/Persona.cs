@@ -10,7 +10,7 @@ namespace AppointmentSystemMedical.Model.Entities
             this.Paciente = new HashSet<Paciente>();
         }
 
-        public int Id { get; set; }
+        public int PersonaId { get; set; }
         public string Dni { get; set; }
         public string Apellidos { get; set; }
         public string Nombres { get; set; }

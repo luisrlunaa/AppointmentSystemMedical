@@ -25,7 +25,7 @@ namespace AppointmentSystemMedical.CapaDatos
                 {
                     var id = temp["Id"] == DBNull.Value ? 0 : Convert.ToInt32(temp["Id"]);
                     var desc = temp["Descripcion"] == DBNull.Value ? string.Empty : Convert.ToString(temp["Descripcion"]);
-                    res.Add(new TurnoEstadoDTO( id, desc ));
+                    res.Add(new TurnoEstadoDTO(id, desc));
                 }
 
                 return (res, "Proceso Completado");
@@ -42,7 +42,7 @@ namespace AppointmentSystemMedical.CapaDatos
             try
             {
                 if (id <= 0)
-                    return (s, "Error Input Invalido, Metodo ClientsRepository.GetClientsByDocumentNo");
+                    return (s, "Error Input Invalido, Metodo TurnoEstadoDAL.BuscarById");
 
                 var classKeys = Data.GetObjectKeys(new TurnoEstado());
                 var sql = Data.SelectExpression("TurnoEstado", classKeys, WhereExpresion: " WHERE Id ='" + id + "'");
@@ -50,7 +50,7 @@ namespace AppointmentSystemMedical.CapaDatos
                 if (dr is null)
                     return (s, message1);
 
-                
+
                 s.Id = dr["Id"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("Id")) : 0;
                 s.Descripcion = dr["Descripcion"].GetType() != typeof(DBNull) ? dr.GetString(dr.GetOrdinal("Descripcion")) : string.Empty;
 

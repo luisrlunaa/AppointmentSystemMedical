@@ -9,7 +9,7 @@ namespace AppointmentSystemMedical.Model.Entities
             this.HistoriaClinica = new HashSet<HistoriaClinica>();
         }
 
-        public int Id { get; set; }
+        public int TurnoId { get; set; }
         public int MedicoId { get; set; }
         public int PacienteId { get; set; }
         public System.DateTime FechaHora { get; set; }

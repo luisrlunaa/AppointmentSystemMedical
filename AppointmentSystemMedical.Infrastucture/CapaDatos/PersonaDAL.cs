@@ -1,104 +1,133 @@
-﻿using AppointmentSystemMedical.Model.DTOs;
+﻿using AppointmentSystemMedical.Infrastucture.Contexts;
+using AppointmentSystemMedical.Model.DTOs;
+using AppointmentSystemMedical.Model.Entities;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 
 namespace AppointmentSystemMedical.CapaDatos
 {
     public class PersonaDAL
     {
-        public static PersonaDTO Buscar(int id)
+        DataManager Data = new DataManager();
+        public (PersonaDTO result, string message) Buscar(int id)
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            var s = new PersonaDTO(0, string.Empty, string.Empty,string.Empty, DateTime.MinValue,string.Empty, string.Empty, string.Empty);
+            try
             {
-                var query = db.Persona
-                    .Where(el => el.Id == id)
-                    .First();
-                return new PersonaDTO(
-                    query.Id,
-                    query.Dni,
-                    query.Apellidos,
-                    query.Nombres,
-                    query.FechaNacimiento,
-                    query.Sexo,
-                    query.CorreoElectronico,
-                    query.Telefono);
+                if (id <= 0)
+                    return (s, "Error Input Invalido, Metodo PersonaDAL.BuscarById");
+
+                var classKeys = Data.GetObjectKeys(new Persona());
+                var sql = Data.SelectExpression("Persona", classKeys, WhereExpresion: " WHERE Persona.PersonaId ='" + id + "'");
+                var (dr, message1) = Data.GetOne(sql, "PersonaDAL.BuscarById");
+                if (dr is null)
+                    return (s, message1);
+
+
+                s.Id = dr["PersonaId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("PersonaId")) : 0;
+                s.Dni = dr["Dni"].GetType() != typeof(DBNull) ? dr.GetString(dr.GetOrdinal("Dni")) : string.Empty;
+                s.Apellidos = dr["Apellidos"].GetType() != typeof(DBNull) ? dr.GetString(dr.GetOrdinal("Apellidos")) : string.Empty;
+                s.Nombres = dr["Nombres"].GetType() != typeof(DBNull) ? dr.GetString(dr.GetOrdinal("Nombres")) : string.Empty;
+                s.FechaNacimiento = dr["FechaNacimiento"].GetType() != typeof(DBNull) ? dr.GetDateTime(dr.GetOrdinal("FechaNacimiento")) : DateTime.MinValue;
+                s.Sexo = dr["Sexo"].GetType() != typeof(DBNull) ? dr.GetString(dr.GetOrdinal("Sexo")) : string.Empty;
+                s.CorreoElectronico = dr["CorreoElectronico"].GetType() != typeof(DBNull) ? dr.GetString(dr.GetOrdinal("CorreoElectronico")) : string.Empty;
+                s.Telefono = dr["Telefono"].GetType() != typeof(DBNull) ? dr.GetString(dr.GetOrdinal("Telefono")) : string.Empty;
+
+                return (s, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (s, "Error al Cargar Data, Metodo PersonaDAL.BuscarById \n" + ex.Message.ToString());
             }
         }
 
-        public static List<PersonaDTO> BuscarDni(string dni)
+        public (List<PersonaDTO> result, string message) BuscarDni(string dni)
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            List<PersonaDTO> res = new List<PersonaDTO>();
+            try
             {
-                List<PersonaDTO> res = new List<PersonaDTO>();
-                var query = db.Persona
-                    .Where(el => el.Dni.Contains(dni))
-                    .OrderBy(el => el.Apellidos)
-                    .ThenBy(el => el.Nombres);
-                foreach (Persona temp in query)
+                var classKeys = Data.GetObjectKeys(new Persona());
+                var sql = Data.SelectExpression("Persona", classKeys, WhereExpresion: "Where Persona.Dni = '" + dni + "'");
+                var (dtPC, message) = Data.GetList(sql, "PersonaDAL.BuscarDni");
+                if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
+                    return (res, message);
+
+                foreach (DataRow temp in dtPC.Rows)
                 {
+                    var Id = temp["PersonaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PersonaId"]);
+                    var Dni = temp["Dni"] == DBNull.Value ? string.Empty : Convert.ToString(temp["Dni"]);
+                    var Apellidos = temp["Apellidos"] == DBNull.Value ? string.Empty : Convert.ToString(temp["Apellidos"]);
+                    var Nombres = temp["Nombres"] == DBNull.Value ? string.Empty : Convert.ToString(temp["Nombres"]);
+                    var FechaNacimiento = temp["FechaNacimiento"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaNacimiento"]);
+                    var Sexo = temp["Sexo"] == DBNull.Value ? string.Empty : Convert.ToString(temp["Sexo"]);
+                    var CorreoElectronico = temp["CorreoElectronico"] == DBNull.Value ? string.Empty : Convert.ToString(temp["CorreoElectronico"]);
+                    var Telefono = temp["Telefono"] == DBNull.Value ? string.Empty : Convert.ToString(temp["Telefono"]);
+
                     res.Add(new PersonaDTO(
-                        temp.Id,
-                        temp.Dni,
-                        temp.Apellidos,
-                        temp.Nombres,
-                        temp.FechaNacimiento,
-                        temp.Sexo,
-                        temp.CorreoElectronico,
-                        temp.Telefono));
+                        Id,
+                        Dni,
+                        Apellidos,
+                        Nombres,
+                        FechaNacimiento,
+                        Sexo,
+                        CorreoElectronico,
+                        Telefono));
                 }
-                return res;
+
+                return (res, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (res, "Error al Cargar Data, Metodo PersonaDAL.BuscarDni \n" + ex.Message.ToString());
             }
         }
 
-        public static bool Guardar(PersonaDTO per)
+        public (bool result, string message) Guardar(PersonaDTO input)
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            try
             {
-                Persona nuevo = new Persona();
-                nuevo.Dni = per.Dni;
-                nuevo.Apellidos = per.Apellidos;
-                nuevo.Nombres = per.Nombres;
-                nuevo.FechaNacimiento = per.FechaNacimiento;
-                nuevo.Sexo = per.Sexo;
-                nuevo.CorreoElectronico = per.CorreoElectronico;
-                nuevo.Telefono = per.Telefono;
-                try
-                {
-                    db.Persona.Add(nuevo);
-                    db.SaveChanges();
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
+                if (input == null || input.Id == 0)
+                    return (false, "Error Input Invalido, Metodo PersonaDAL.Guardar");
+
+                var parameters = new List<string> {  "'" + input.Dni + "'", "'" + input.Apellidos + "'", "'" + input.Nombres + "'", 
+                    "'" + input.FechaNacimiento.ToShortDateString() + "'", "'" + input.Sexo + "'", "'" + input.CorreoElectronico + "'", 
+                    "'" + input.Telefono + "'" };
+                var classKeys = Data.GetObjectKeys(new Persona()).Where(x => x != "PersonaId").ToList();
+                var sql = Data.InsertExpression("Persona", classKeys, parameters);
+                var (response, message) = Data.CrudAction(sql, "PersonaDAL.Guardar");
+                if (!response)
+                    return (response, message);
+
+                return (response, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (false, "Error al Cargar Data, Metodo PersonaDAL.Guardar \n" + ex.Message.ToString());
             }
         }
 
-        public static bool Editar(PersonaDTO per)
+        public (bool result, string message) Editar(PersonaDTO input)
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            try
             {
-                Persona modificado = db.Persona
-                    .Where(el => el.Id == per.Id)
-                    .First();
-                modificado.Dni = per.Dni;
-                modificado.Apellidos = per.Apellidos;
-                modificado.Nombres = per.Nombres;
-                modificado.FechaNacimiento = per.FechaNacimiento;
-                modificado.Sexo = per.Sexo;
-                modificado.CorreoElectronico = per.CorreoElectronico;
-                modificado.Telefono = per.Telefono;
-                try
-                {
-                    db.Entry(modificado).State = EntityState.Modified;
-                    db.SaveChanges();
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
+                if (input == null || input.Id == 0)
+                    return (false, "Error Input Invalido, Metodo ObraSocialDAL.Editar");
+
+                var parameters = new List<string> { "'" + input.Apellidos + "'", "'" + input.Nombres + "'", "'" + input.FechaNacimiento.ToShortDateString() + "'", 
+                    "'" + input.Sexo + "'", "'" + input.CorreoElectronico + "'", "'" + input.Telefono + "'" };
+                var classKeys = Data.GetObjectKeys(new Persona()).Where(x => x != "PersonaId" && x != "Dni").ToList();
+                var sql = Data.UpdateExpression("ObraSocial", classKeys, parameters, " WHERE Dni = '" + input.Dni + "'");
+                var (response, message) = Data.CrudAction(sql, "PersonaDAL.Editar");
+                if (!response)
+                    return (response, message);
+
+                return (response, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (false, "Error al Cargar Data, Metodo PersonaDAL.Editar \n" + ex.Message.ToString());
             }
         }
     }

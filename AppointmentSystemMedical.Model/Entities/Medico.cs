@@ -9,7 +9,7 @@ namespace AppointmentSystemMedical.Model.Entities
             this.Turno = new HashSet<Turno>();
         }
 
-        public int Id { get; set; }
+        public int MedicoId { get; set; }
         public int EmpleadoId { get; set; }
         public string Matricula { get; set; }
         public int EspecialidadId { get; set; }

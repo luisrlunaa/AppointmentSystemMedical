@@ -154,9 +154,9 @@ namespace AppointmentSystemMedical.CapaDatos
                         new MedicoDTO(
                             temp.Medico.Id,
                             new EmpleadoDTO(
-                                temp.Medico.Empleado.Id,
+                                temp.Medico.Empleado.EmpleadoId,
                                 new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.Id,
+                                    temp.Medico.Empleado.Persona.PersonaId,
                                     temp.Medico.Empleado.Persona.Dni,
                                     temp.Medico.Empleado.Persona.Apellidos,
                                     temp.Medico.Empleado.Persona.Nombres,
@@ -179,7 +179,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new PacienteDTO(
                             temp.Paciente.Id,
                             new PersonaDTO(
-                                temp.Paciente.Persona.Id,
+                                temp.Paciente.Persona.PersonaId,
                                 temp.Paciente.Persona.Dni,
                                 temp.Paciente.Persona.Apellidos,
                                 temp.Paciente.Persona.Nombres,
@@ -219,9 +219,9 @@ namespace AppointmentSystemMedical.CapaDatos
                         new MedicoDTO(
                             temp.Medico.Id,
                             new EmpleadoDTO(
-                                temp.Medico.Empleado.Id,
+                                temp.Medico.Empleado.EmpleadoId,
                                 new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.Id,
+                                    temp.Medico.Empleado.Persona.PersonaId,
                                     temp.Medico.Empleado.Persona.Dni,
                                     temp.Medico.Empleado.Persona.Apellidos,
                                     temp.Medico.Empleado.Persona.Nombres,
@@ -244,7 +244,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new PacienteDTO(
                             temp.Paciente.Id,
                             new PersonaDTO(
-                                temp.Paciente.Persona.Id,
+                                temp.Paciente.Persona.PersonaId,
                                 temp.Paciente.Persona.Dni,
                                 temp.Paciente.Persona.Apellidos,
                                 temp.Paciente.Persona.Nombres,
@@ -286,9 +286,9 @@ namespace AppointmentSystemMedical.CapaDatos
                         new MedicoDTO(
                             temp.Medico.Id,
                             new EmpleadoDTO(
-                                temp.Medico.Empleado.Id,
+                                temp.Medico.Empleado.EmpleadoId,
                                 new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.Id,
+                                    temp.Medico.Empleado.Persona.PersonaId,
                                     temp.Medico.Empleado.Persona.Dni,
                                     temp.Medico.Empleado.Persona.Apellidos,
                                     temp.Medico.Empleado.Persona.Nombres,
@@ -311,7 +311,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new PacienteDTO(
                             temp.Paciente.Id,
                             new PersonaDTO(
-                                temp.Paciente.Persona.Id,
+                                temp.Paciente.Persona.PersonaId,
                                 temp.Paciente.Persona.Dni,
                                 temp.Paciente.Persona.Apellidos,
                                 temp.Paciente.Persona.Nombres,
@@ -354,9 +354,9 @@ namespace AppointmentSystemMedical.CapaDatos
                         new MedicoDTO(
                             temp.Medico.Id,
                             new EmpleadoDTO(
-                                temp.Medico.Empleado.Id,
+                                temp.Medico.Empleado.EmpleadoId,
                                 new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.Id,
+                                    temp.Medico.Empleado.Persona.PersonaId,
                                     temp.Medico.Empleado.Persona.Dni,
                                     temp.Medico.Empleado.Persona.Apellidos,
                                     temp.Medico.Empleado.Persona.Nombres,
@@ -379,7 +379,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new PacienteDTO(
                             temp.Paciente.Id,
                             new PersonaDTO(
-                                temp.Paciente.Persona.Id,
+                                temp.Paciente.Persona.PersonaId,
                                 temp.Paciente.Persona.Dni,
                                 temp.Paciente.Persona.Apellidos,
                                 temp.Paciente.Persona.Nombres,
@@ -422,9 +422,9 @@ namespace AppointmentSystemMedical.CapaDatos
                         new MedicoDTO(
                             temp.Medico.Id,
                             new EmpleadoDTO(
-                                temp.Medico.Empleado.Id,
+                                temp.Medico.Empleado.EmpleadoId,
                                 new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.Id,
+                                    temp.Medico.Empleado.Persona.PersonaId,
                                     temp.Medico.Empleado.Persona.Dni,
                                     temp.Medico.Empleado.Persona.Apellidos,
                                     temp.Medico.Empleado.Persona.Nombres,
@@ -447,7 +447,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new PacienteDTO(
                             temp.Paciente.Id,
                             new PersonaDTO(
-                                temp.Paciente.Persona.Id,
+                                temp.Paciente.Persona.PersonaId,
                                 temp.Paciente.Persona.Dni,
                                 temp.Paciente.Persona.Apellidos,
                                 temp.Paciente.Persona.Nombres,
@@ -492,9 +492,9 @@ namespace AppointmentSystemMedical.CapaDatos
                         new MedicoDTO(
                             temp.Medico.Id,
                             new EmpleadoDTO(
-                                temp.Medico.Empleado.Id,
+                                temp.Medico.Empleado.EmpleadoId,
                                 new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.Id,
+                                    temp.Medico.Empleado.Persona.PersonaId,
                                     temp.Medico.Empleado.Persona.Dni,
                                     temp.Medico.Empleado.Persona.Apellidos,
                                     temp.Medico.Empleado.Persona.Nombres,
@@ -517,7 +517,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new PacienteDTO(
                             temp.Paciente.Id,
                             new PersonaDTO(
-                                temp.Paciente.Persona.Id,
+                                temp.Paciente.Persona.PersonaId,
                                 temp.Paciente.Persona.Dni,
                                 temp.Paciente.Persona.Apellidos,
                                 temp.Paciente.Persona.Nombres,
@@ -559,9 +559,9 @@ namespace AppointmentSystemMedical.CapaDatos
                         new MedicoDTO(
                             temp.Medico.Id,
                             new EmpleadoDTO(
-                                temp.Medico.Empleado.Id,
+                                temp.Medico.Empleado.EmpleadoId,
                                 new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.Id,
+                                    temp.Medico.Empleado.Persona.PersonaId,
                                     temp.Medico.Empleado.Persona.Dni,
                                     temp.Medico.Empleado.Persona.Apellidos,
                                     temp.Medico.Empleado.Persona.Nombres,
@@ -584,7 +584,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new PacienteDTO(
                             temp.Paciente.Id,
                             new PersonaDTO(
-                                temp.Paciente.Persona.Id,
+                                temp.Paciente.Persona.PersonaId,
                                 temp.Paciente.Persona.Dni,
                                 temp.Paciente.Persona.Apellidos,
                                 temp.Paciente.Persona.Nombres,
@@ -628,9 +628,9 @@ namespace AppointmentSystemMedical.CapaDatos
                         new MedicoDTO(
                             temp.Medico.Id,
                             new EmpleadoDTO(
-                                temp.Medico.Empleado.Id,
+                                temp.Medico.Empleado.EmpleadoId,
                                 new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.Id,
+                                    temp.Medico.Empleado.Persona.PersonaId,
                                     temp.Medico.Empleado.Persona.Dni,
                                     temp.Medico.Empleado.Persona.Apellidos,
                                     temp.Medico.Empleado.Persona.Nombres,
@@ -653,7 +653,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new PacienteDTO(
                             temp.Paciente.Id,
                             new PersonaDTO(
-                                temp.Paciente.Persona.Id,
+                                temp.Paciente.Persona.PersonaId,
                                 temp.Paciente.Persona.Dni,
                                 temp.Paciente.Persona.Apellidos,
                                 temp.Paciente.Persona.Nombres,
@@ -694,9 +694,9 @@ namespace AppointmentSystemMedical.CapaDatos
                         new MedicoDTO(
                             temp.Medico.Id,
                             new EmpleadoDTO(
-                                temp.Medico.Empleado.Id,
+                                temp.Medico.Empleado.EmpleadoId,
                                 new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.Id,
+                                    temp.Medico.Empleado.Persona.PersonaId,
                                     temp.Medico.Empleado.Persona.Dni,
                                     temp.Medico.Empleado.Persona.Apellidos,
                                     temp.Medico.Empleado.Persona.Nombres,
@@ -719,7 +719,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new PacienteDTO(
                             temp.Paciente.Id,
                             new PersonaDTO(
-                                temp.Paciente.Persona.Id,
+                                temp.Paciente.Persona.PersonaId,
                                 temp.Paciente.Persona.Dni,
                                 temp.Paciente.Persona.Apellidos,
                                 temp.Paciente.Persona.Nombres,
@@ -762,9 +762,9 @@ namespace AppointmentSystemMedical.CapaDatos
                         new MedicoDTO(
                             temp.Medico.Id,
                             new EmpleadoDTO(
-                                temp.Medico.Empleado.Id,
+                                temp.Medico.Empleado.EmpleadoId,
                                 new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.Id,
+                                    temp.Medico.Empleado.Persona.PersonaId,
                                     temp.Medico.Empleado.Persona.Dni,
                                     temp.Medico.Empleado.Persona.Apellidos,
                                     temp.Medico.Empleado.Persona.Nombres,
@@ -787,7 +787,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new PacienteDTO(
                             temp.Paciente.Id,
                             new PersonaDTO(
-                                temp.Paciente.Persona.Id,
+                                temp.Paciente.Persona.PersonaId,
                                 temp.Paciente.Persona.Dni,
                                 temp.Paciente.Persona.Apellidos,
                                 temp.Paciente.Persona.Nombres,
@@ -828,9 +828,9 @@ namespace AppointmentSystemMedical.CapaDatos
                         new MedicoDTO(
                             temp.Medico.Id,
                             new EmpleadoDTO(
-                                temp.Medico.Empleado.Id,
+                                temp.Medico.Empleado.EmpleadoId,
                                 new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.Id,
+                                    temp.Medico.Empleado.Persona.PersonaId,
                                     temp.Medico.Empleado.Persona.Dni,
                                     temp.Medico.Empleado.Persona.Apellidos,
                                     temp.Medico.Empleado.Persona.Nombres,
@@ -853,7 +853,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new PacienteDTO(
                             temp.Paciente.Id,
                             new PersonaDTO(
-                                temp.Paciente.Persona.Id,
+                                temp.Paciente.Persona.PersonaId,
                                 temp.Paciente.Persona.Dni,
                                 temp.Paciente.Persona.Apellidos,
                                 temp.Paciente.Persona.Nombres,
@@ -896,9 +896,9 @@ namespace AppointmentSystemMedical.CapaDatos
                         new MedicoDTO(
                             temp.Medico.Id,
                             new EmpleadoDTO(
-                                temp.Medico.Empleado.Id,
+                                temp.Medico.Empleado.EmpleadoId,
                                 new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.Id,
+                                    temp.Medico.Empleado.Persona.PersonaId,
                                     temp.Medico.Empleado.Persona.Dni,
                                     temp.Medico.Empleado.Persona.Apellidos,
                                     temp.Medico.Empleado.Persona.Nombres,
@@ -921,7 +921,7 @@ namespace AppointmentSystemMedical.CapaDatos
                         new PacienteDTO(
                             temp.Paciente.Id,
                             new PersonaDTO(
-                                temp.Paciente.Persona.Id,
+                                temp.Paciente.Persona.PersonaId,
                                 temp.Paciente.Persona.Dni,
                                 temp.Paciente.Persona.Apellidos,
                                 temp.Paciente.Persona.Nombres,

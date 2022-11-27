@@ -9,7 +9,7 @@ namespace AppointmentSystemMedical.Model.Entities
             this.Medico = new HashSet<Medico>();
         }
 
-        public int Id { get; set; }
+        public int EmpleadoId { get; set; }
         public int PersonaId { get; set; }
         public System.DateTime FechaIngreso { get; set; }
         public string Usuario { get; set; }
