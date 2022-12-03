@@ -13,6 +13,8 @@ namespace AppointmentSystemMedical.Model.DTOs
         public TipoUsuarioDTO TipoUsuario;
         public bool Activo;
 
+        public EmpleadoDTO() { }
+
         public EmpleadoDTO(int _id, PersonaDTO _persona, string _cuil,
             string _usuario, string _contraseña, DateTime _fechaIngreso,
             TipoUsuarioDTO _tipoUsuario, bool _activo)

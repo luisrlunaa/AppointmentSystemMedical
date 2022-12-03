@@ -13,7 +13,7 @@ namespace AppointmentSystemMedical.CapaDatos
         DataManager Data = new DataManager();
         public (PersonaDTO result, string message) Buscar(int id)
         {
-            var s = new PersonaDTO(0, string.Empty, string.Empty,string.Empty, DateTime.MinValue,string.Empty, string.Empty, string.Empty);
+            var s = new PersonaDTO();
             try
             {
                 if (id <= 0)
@@ -91,8 +91,8 @@ namespace AppointmentSystemMedical.CapaDatos
                 if (input == null || input.Id == 0)
                     return (false, "Error Input Invalido, Metodo PersonaDAL.Guardar");
 
-                var parameters = new List<string> {  "'" + input.Dni + "'", "'" + input.Apellidos + "'", "'" + input.Nombres + "'", 
-                    "'" + input.FechaNacimiento.ToShortDateString() + "'", "'" + input.Sexo + "'", "'" + input.CorreoElectronico + "'", 
+                var parameters = new List<string> {  "'" + input.Dni + "'", "'" + input.Apellidos + "'", "'" + input.Nombres + "'",
+                    "'" + input.FechaNacimiento.ToShortDateString() + "'", "'" + input.Sexo + "'", "'" + input.CorreoElectronico + "'",
                     "'" + input.Telefono + "'" };
                 var classKeys = Data.GetObjectKeys(new Persona()).Where(x => x != "PersonaId").ToList();
                 var sql = Data.InsertExpression("Persona", classKeys, parameters);
@@ -115,7 +115,7 @@ namespace AppointmentSystemMedical.CapaDatos
                 if (input == null || input.Id == 0)
                     return (false, "Error Input Invalido, Metodo ObraSocialDAL.Editar");
 
-                var parameters = new List<string> { "'" + input.Apellidos + "'", "'" + input.Nombres + "'", "'" + input.FechaNacimiento.ToShortDateString() + "'", 
+                var parameters = new List<string> { "'" + input.Apellidos + "'", "'" + input.Nombres + "'", "'" + input.FechaNacimiento.ToShortDateString() + "'",
                     "'" + input.Sexo + "'", "'" + input.CorreoElectronico + "'", "'" + input.Telefono + "'" };
                 var classKeys = Data.GetObjectKeys(new Persona()).Where(x => x != "PersonaId" && x != "Dni").ToList();
                 var sql = Data.UpdateExpression("ObraSocial", classKeys, parameters, " WHERE Dni = '" + input.Dni + "'");

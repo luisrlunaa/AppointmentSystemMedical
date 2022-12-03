@@ -5,6 +5,7 @@
         public int Id;
         public PersonaDTO Persona;
 
+        public PacienteDTO() { }
         public PacienteDTO(int _id, PersonaDTO _persona)
         {
             Id = _id;

@@ -7,6 +7,7 @@
         public string Descripcion;
         public string Archivo;
 
+        public HistoriaClinicaDTO() { }
         public HistoriaClinicaDTO(int _id, TurnoDTO _turno, string _descripcion,
             string _archivo)
         {

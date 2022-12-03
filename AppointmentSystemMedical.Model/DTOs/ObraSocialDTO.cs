@@ -6,6 +6,7 @@
         public string Nombre;
         public bool Estado;
 
+        public ObraSocialDTO() { }
         public ObraSocialDTO(int _id, string _nombre, bool? _estado)
         {
             Id = _id;

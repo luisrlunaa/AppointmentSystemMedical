@@ -40,7 +40,7 @@ namespace AppointmentSystemMedical.CapaDatos
 
         public (ObraSocialDTO result, string message) Buscar(int id)
         {
-            var s = new ObraSocialDTO(0, string.Empty, false);
+            var s = new ObraSocialDTO();
             try
             {
                 if (id <= 0)

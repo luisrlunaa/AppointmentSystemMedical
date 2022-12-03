@@ -7,6 +7,7 @@
         public string Descripcion;
         public bool Estado;
 
+        public CoberturaDTO() { }
         public CoberturaDTO(int _id, ObraSocialDTO _obraSocial, string _descripcion, bool? _estado)
         {
             Id = _id;

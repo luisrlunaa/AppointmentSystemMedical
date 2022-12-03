@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Net;
 
 namespace AppointmentSystemMedical.CapaDatos
 {
@@ -58,7 +57,7 @@ namespace AppointmentSystemMedical.CapaDatos
 
         public (PacienteDTO result, string message) Buscar(int id)
         {
-            var s = new PacienteDTO(0, new PersonaDTO(0, string.Empty, string.Empty, string.Empty, DateTime.MinValue, string.Empty, string.Empty, string.Empty));
+            var s = new PacienteDTO();
             try
             {
                 if (id <= 0)
@@ -106,7 +105,7 @@ namespace AppointmentSystemMedical.CapaDatos
                 {
                     var id = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
                     var (patient, message1) = Buscar(id);
-                    if(!message1.Contains("Error"))
+                    if (!message1.Contains("Error"))
                         res.Add(patient);
                 }
 
@@ -125,7 +124,7 @@ namespace AppointmentSystemMedical.CapaDatos
             {
                 var join = Data.JoinExpression("INNER", new List<string>() { "Paciente" }, new List<string>() { "Persona" }, new List<string>() { "PersonaId" });
                 var classKeys = Data.GetObjectKeys(new Paciente());
-                var sql = Data.SelectExpression("Paciente", classKeys, WhereExpresion: "WHERE Persona.Dni Like '%"+ dni +"%'");
+                var sql = Data.SelectExpression("Paciente", classKeys, WhereExpresion: "WHERE Persona.Dni Like '%" + dni + "%'");
                 var (dtPC, message) = Data.GetList(sql, "PacienteDAL.BuscarDni");
                 if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
                     return (res, message);
@@ -168,7 +167,7 @@ namespace AppointmentSystemMedical.CapaDatos
                 // Busco los pacientes de ese medico
                 var join = Data.JoinExpression("INNER", new List<string>() { "Turno" }, new List<string>() { "Medico" }, new List<string>() { "MedicoId" });
                 var classKeys = new List<string>() { "PacienteId" };
-                var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: "WHERE Medico.EmpleadoId ='"+ med.Id + "'");
+                var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: "WHERE Medico.EmpleadoId ='" + med.Id + "'");
                 var (dtPC, message) = Data.GetList(sql, "PacienteDAL.BuscarDni");
 
                 foreach (DataRow temp in dtPC.Rows)
@@ -265,17 +264,17 @@ namespace AppointmentSystemMedical.CapaDatos
 
                 var (add, message1) = persona.Guardar(new PersonaDTO(input.Persona.Id, input.Persona.Dni, input.Persona.Apellidos, input.Persona.Nombres,
                     input.Persona.FechaNacimiento, input.Persona.Sexo, input.Persona.CorreoElectronico, input.Persona.Telefono));
-                
-                if(!add)
+
+                if (!add)
                     return (add, message1);
 
-                var sql = Data.SelectExpression("Persona", new List<string>() { "PersonaId" },OrderBy: "PersonaId DESC");
+                var sql = Data.SelectExpression("Persona", new List<string>() { "PersonaId" }, OrderBy: "PersonaId DESC");
                 var (dr, message2) = Data.GetOne(sql, "PersonaDAL.BuscarById");
                 if (dr is null)
                     return (false, message2);
 
                 var Id = dr["PersonaId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("PersonaId")) : 0;
-                var parameters = new List<string> {  "'" + input.Id + "'", "'" + Id + "'"};
+                var parameters = new List<string> { "'" + input.Id + "'", "'" + Id + "'" };
                 var classKeys = Data.GetObjectKeys(new Paciente()).Where(x => x != "PacienteId").ToList();
                 var sql1 = Data.InsertExpression("Paciente", classKeys, parameters);
                 var (response, message) = Data.CrudAction(sql1, "PacienteDAL.Guardar");

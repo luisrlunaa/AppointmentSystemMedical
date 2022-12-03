@@ -1,21 +1,26 @@
 ﻿using AppointmentSystemMedical.CapaDatos;
-using System.Collections.Generic;
+using AppointmentSystemMedical.Model.DTOs;
 using System.Windows.Forms;
 
 namespace AppointmentSystemMedical.CapaLogica
 {
     public class Cobertura
     {
-        public static CoberturaDTO Buscar(int id)
+        CoberturaDAL coberturaDAL = new CoberturaDAL();
+        ObraSocialDAL obraSocialDAL = new ObraSocialDAL();
+        public CoberturaDTO Buscar(int id)
         {
-            return CoberturaDAL.Buscar(id);
+            var (c, message) = coberturaDAL.Buscar(id);
+            if (message.Contains("Error"))
+                return new CoberturaDTO();
+
+            return c;
         }
 
-        public static void CargarDataGrid(DataGridView grd)
+        public void CargarDataGrid(DataGridView grd)
         {
             grd.Rows.Clear();
-            List<CoberturaDTO> coberturas = new List<CoberturaDTO>();
-            coberturas = CoberturaDAL.Buscar();
+            var (coberturas, message) = coberturaDAL.Buscar();
             foreach (CoberturaDTO temp in coberturas)
             {
                 if (temp.Id != 10)
@@ -29,11 +34,10 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void CargarDataGrid(DataGridView grd, string apenom)
+        public void CargarDataGrid(DataGridView grd, string apenom)
         {
             grd.Rows.Clear();
-            List<CoberturaDTO> coberturas = new List<CoberturaDTO>();
-            coberturas = CoberturaDAL.Buscar(apenom);
+            var (coberturas, message) = coberturaDAL.Buscar(apenom);
             foreach (CoberturaDTO temp in coberturas)
             {
                 if (temp.Id != 10)
@@ -47,11 +51,10 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void CargarDataGridBusqueda(DataGridView grd, string apenom)
+        public void CargarDataGridBusqueda(DataGridView grd, string apenom)
         {
             grd.Rows.Clear();
-            List<CoberturaDTO> coberturas = new List<CoberturaDTO>();
-            coberturas = CoberturaDAL.Buscar(apenom);
+            var (coberturas, message) = coberturaDAL.Buscar(apenom);
             foreach (CoberturaDTO temp in coberturas)
             {
                 if (temp.Id != 10 && temp.Estado)
@@ -64,10 +67,23 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void Guardar(int os, string nom, bool estado)
+        public void Guardar(int os, string nom, bool estado)
         {
-            CoberturaDTO nuevo = new CoberturaDTO(ObraSocialDAL.Buscar(os), nom, estado);
-            if (CoberturaDAL.Guardar(nuevo))
+            var (ob, message) = obraSocialDAL.Buscar(os);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            var nuevo = new CoberturaDTO(ob, nom, estado);
+            var (save, message1) = coberturaDAL.Guardar(nuevo);
+            if (message1.Contains("Error"))
+                MessageBox.Show(message1,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+            if (save)
             {
                 MessageBox.Show(
                     "La Cobertura fue guardada correctamente.",
@@ -85,10 +101,24 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void Editar(int id, int os, string nom, bool estado)
+        public void Editar(int id, int os, string nom, bool estado)
         {
-            CoberturaDTO modificado = new CoberturaDTO(id, ObraSocialDAL.Buscar(os), nom, estado);
-            if (CoberturaDAL.Editar(modificado))
+            var (ob, message) = obraSocialDAL.Buscar(os);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            CoberturaDTO modificado = new CoberturaDTO(id, ob, nom, estado);
+
+            var (save, message1) = coberturaDAL.Editar(modificado);
+            if (message1.Contains("Error"))
+                MessageBox.Show(message1,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+            if (save)
             {
                 MessageBox.Show(
                     "La Cobertura fue modificada correctamente.",

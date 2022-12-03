@@ -5,6 +5,7 @@
         public int Id;
         public string Descripcion;
 
+        public TipoUsuarioDTO() { }
         public TipoUsuarioDTO(int _id, string _descripcion)
         {
             Id = _id;

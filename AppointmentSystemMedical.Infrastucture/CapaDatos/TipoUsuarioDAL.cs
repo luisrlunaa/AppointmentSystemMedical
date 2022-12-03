@@ -4,7 +4,6 @@ using AppointmentSystemMedical.Model.Entities;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 
 namespace AppointmentSystemMedical.CapaDatos
 {
@@ -24,7 +23,7 @@ namespace AppointmentSystemMedical.CapaDatos
 
                 foreach (DataRow temp in dtPC.Rows)
                 {
-                    var id = temp["Id"] == DBNull.Value ? 0 : Convert.ToInt32(temp["Id"]);
+                    var id = temp["TipoUsuarioId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["TipoUsuarioId"]);
                     var desc = temp["Descripcion"] == DBNull.Value ? string.Empty : Convert.ToString(temp["Descripcion"]);
                     res.Add(new TipoUsuarioDTO(id, desc));
                 }
@@ -39,14 +38,14 @@ namespace AppointmentSystemMedical.CapaDatos
 
         public (TipoUsuarioDTO result, string message) Buscar(int id)
         {
-            var s = new TipoUsuarioDTO(0, string.Empty);
+            var s = new TipoUsuarioDTO();
             try
             {
                 if (id <= 0)
                     return (s, "Error Input Invalido, Metodo TipoUsuarioDAL.BuscarById");
 
                 var classKeys = Data.GetObjectKeys(new TipoUsuario());
-                var sql = Data.SelectExpression("TipoUsuario", classKeys, WhereExpresion: " WHERE Id ='" + id + "'");
+                var sql = Data.SelectExpression("TipoUsuario", classKeys, WhereExpresion: " WHERE TipoUsuarioId ='" + id + "'");
                 var (dr, message1) = Data.GetOne(sql, "TipoUsuarioDAL.BuscarById");
                 if (dr is null)
                     return (s, message1);

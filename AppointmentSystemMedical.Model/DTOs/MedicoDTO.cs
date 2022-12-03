@@ -7,6 +7,7 @@
         public string Matricula;
         public EspecialidadDTO Especialidad;
 
+        public MedicoDTO() { }
         public MedicoDTO(int _id, EmpleadoDTO _empleado, string _matricula,
             EspecialidadDTO _especialidad)
         {

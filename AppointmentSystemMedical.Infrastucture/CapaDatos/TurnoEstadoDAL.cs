@@ -23,7 +23,7 @@ namespace AppointmentSystemMedical.CapaDatos
 
                 foreach (DataRow temp in dtPC.Rows)
                 {
-                    var id = temp["Id"] == DBNull.Value ? 0 : Convert.ToInt32(temp["Id"]);
+                    var id = temp["TurnoEstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["TurnoEstadoId"]);
                     var desc = temp["Descripcion"] == DBNull.Value ? string.Empty : Convert.ToString(temp["Descripcion"]);
                     res.Add(new TurnoEstadoDTO(id, desc));
                 }
@@ -38,20 +38,20 @@ namespace AppointmentSystemMedical.CapaDatos
 
         public (TurnoEstadoDTO result, string message) Buscar(int id)
         {
-            var s = new TurnoEstadoDTO(0, string.Empty);
+            var s = new TurnoEstadoDTO();
             try
             {
                 if (id <= 0)
                     return (s, "Error Input Invalido, Metodo TurnoEstadoDAL.BuscarById");
 
                 var classKeys = Data.GetObjectKeys(new TurnoEstado());
-                var sql = Data.SelectExpression("TurnoEstado", classKeys, WhereExpresion: " WHERE Id ='" + id + "'");
+                var sql = Data.SelectExpression("TurnoEstado", classKeys, WhereExpresion: " WHERE TurnoEstadoId ='" + id + "'");
                 var (dr, message1) = Data.GetOne(sql, "TurnoEstadoDAL.BuscarById");
                 if (dr is null)
                     return (s, message1);
 
 
-                s.Id = dr["Id"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("Id")) : 0;
+                s.Id = dr["TurnoEstadoId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("TurnoEstadoId")) : 0;
                 s.Descripcion = dr["Descripcion"].GetType() != typeof(DBNull) ? dr.GetString(dr.GetOrdinal("Descripcion")) : string.Empty;
 
                 return (s, "Proceso Completado");

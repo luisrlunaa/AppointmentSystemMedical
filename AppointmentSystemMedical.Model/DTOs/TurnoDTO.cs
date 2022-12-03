@@ -11,6 +11,7 @@ namespace AppointmentSystemMedical.Model.DTOs
         public CoberturaDTO Cobertura;
         public TurnoEstadoDTO Estado;
 
+        public TurnoDTO() { }
         public TurnoDTO(int _id, MedicoDTO _medico, PacienteDTO _paciente,
             DateTime _fechaHora, CoberturaDTO _cobertura, TurnoEstadoDTO _estado)
         {

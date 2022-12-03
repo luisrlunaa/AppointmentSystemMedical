@@ -39,7 +39,7 @@ namespace AppointmentSystemMedical.CapaDatos
 
         public (EspecialidadDTO result, string message) Buscar(int id)
         {
-            var s = new EspecialidadDTO(0, string.Empty);
+            var s = new EspecialidadDTO();
             try
             {
                 if (id <= 0)
@@ -96,7 +96,7 @@ namespace AppointmentSystemMedical.CapaDatos
                 if (input == null || input.Id == 0)
                     return (false, "Error Input Invalido, Metodo EspecialidadDAL.Guardar");
 
-                var parameters = new List<string> { "'" + input.Descripcion + "'"};
+                var parameters = new List<string> { "'" + input.Descripcion + "'" };
                 var classKeys = Data.GetObjectKeys(new Especialidad()).Where(x => x != "Id").ToList();
                 var sql = Data.InsertExpression("Especialidad", classKeys, parameters);
                 var (response, message) = Data.CrudAction(sql, "EspecialidadDAL.Guardar");
@@ -118,7 +118,7 @@ namespace AppointmentSystemMedical.CapaDatos
                 if (input == null || input.Id == 0)
                     return (false, "Error Input Invalido, Metodo EspecialidadDAL.Editar");
 
-                var parameters = new List<string> { "'" + input.Descripcion + "'"};
+                var parameters = new List<string> { "'" + input.Descripcion + "'" };
                 var classKeys = Data.GetObjectKeys(new Especialidad()).Where(x => x != "Id").ToList();
                 var sql = Data.UpdateExpression("Especialidad", classKeys, parameters, " WHERE Id = '" + input.Id + "'");
                 var (response, message) = Data.CrudAction(sql, "EspecialidadDAL.Editar");

@@ -12,6 +12,7 @@ namespace AppointmentSystemMedical.Model.DTOs
         public string Sexo;
         public string CorreoElectronico;
         public string Telefono;
+        public PersonaDTO() { }
 
         public PersonaDTO(int _id, string _dni, string _apellidos,
             string _nombres, DateTime _fechaNacimiento, string _sexo,

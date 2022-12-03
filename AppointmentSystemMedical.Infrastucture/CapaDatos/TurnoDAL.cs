@@ -11,986 +11,911 @@ namespace AppointmentSystemMedical.CapaDatos
     public class TurnoDAL
     {
         DataManager Data = new DataManager();
+        MedicoDAL medicoDAL = new MedicoDAL();
+        PacienteDAL pacienteDAL = new PacienteDAL();
+        CoberturaDAL coberturaDAL = new CoberturaDAL();
+        TurnoEstadoDAL turnoEstadoDAL = new TurnoEstadoDAL();
+
         public (List<TurnoDTO> result, string message) Buscar()
         {
             List<TurnoDTO> res = new List<TurnoDTO>();
-            var classKeys = Data.GetObjectKeys(new Turno());
-            var sql = Data.SelectExpression("Turno", classKeys, OrderBy: "FechaHora");
-            var (dtPC, message) = Data.GetList(sql, "TurnoDAL.Buscar");
-            if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
-                return (res, message);
+            try
+            {
+                var classKeys = Data.GetObjectKeys(new Turno());
+                var sql = Data.SelectExpression("Turno", classKeys, OrderBy: "FechaHora");
+                var (dtPC, message) = Data.GetList(sql, "TurnoDAL.Buscar");
+                if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
+                    return (res, message);
 
                 foreach (DataRow temp in dtPC.Rows)
                 {
-                    res.Add(new TurnoDTO(
-                        temp["Id"] == DBNull.Value ? 0 : Convert.ToInt32(temp["Id"]),
-                        new MedicoDTO(
-                            temp.Medico.Id,
-                            new EmpleadoDTO(
-                                temp.Medico.Empleado.Id,
-                                new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.Id,
-                                    temp.Medico.Empleado.Persona.Dni,
-                                    temp.Medico.Empleado.Persona.Apellidos,
-                                    temp.Medico.Empleado.Persona.Nombres,
-                                    temp.Medico.Empleado.Persona.FechaNacimiento,
-                                    temp.Medico.Empleado.Persona.Sexo,
-                                    temp.Medico.Empleado.Persona.CorreoElectronico,
-                                    temp.Medico.Empleado.Persona.Telefono),
-                                temp.Medico.Empleado.Cuil,
-                                temp.Medico.Empleado.Usuario,
-                                temp.Medico.Empleado.Contraseña,
-                                temp.Medico.Empleado.FechaIngreso,
-                                new TipoUsuarioDTO(
-                                    temp.Medico.Empleado.TipoUsuario.Id,
-                                    temp.Medico.Empleado.TipoUsuario.Descripcion),
-                                temp.Medico.Empleado.Activo),
-                            temp.Medico.Matricula,
-                            new EspecialidadDTO(
-                                temp.Medico.Especialidad.Id,
-                                temp.Medico.Especialidad.Descripcion)),
-                        new PacienteDTO(
-                            temp.Paciente.Id,
-                            new PersonaDTO(
-                                temp.Paciente.Persona.Id,
-                                temp.Paciente.Persona.Dni,
-                                temp.Paciente.Persona.Apellidos,
-                                temp.Paciente.Persona.Nombres,
-                                temp.Paciente.Persona.FechaNacimiento,
-                                temp.Paciente.Persona.Sexo,
-                                temp.Paciente.Persona.CorreoElectronico,
-                                temp.Paciente.Persona.Telefono)),
-                        temp.FechaHora,
-                        new CoberturaDTO(
-                            temp.Cobertura.Id,
-                            new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.Id,
-                                temp.Cobertura.ObraSocial.Nombre,
-                                temp.Cobertura.ObraSocial.Estado),
-                            temp.Cobertura.Descripcion,
-                            temp.Cobertura.Estado),
-                        new TurnoEstadoDTO(
-                            temp.TurnoEstado.Id,
-                            temp.TurnoEstado.Descripcion)));
+                    var s = new TurnoDTO();
+                    s.Id = temp["TurnoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["TurnoId"]);
+                    s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
+
+                    var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    if (idm > 0)
+                    {
+                        var medico = medicoDAL.Buscar(idm);
+                        if (medico.result != null)
+                            s.Medico = medico.result;
+                    }
+
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    if (idc > 0)
+                    {
+                        var cobertura = coberturaDAL.Buscar(idc);
+                        if (cobertura.result != null)
+                            s.Cobertura = cobertura.result;
+                    }
+
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    if (idp > 0)
+                    {
+                        var paciente = pacienteDAL.Buscar(idp);
+                        if (paciente.result != null)
+                            s.Paciente = paciente.result;
+                    }
+
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+                    if (ide > 0)
+                    {
+                        var estado = turnoEstadoDAL.Buscar(ide);
+                        if (estado.result != null)
+                            s.Estado = estado.result;
+                    }
+
+                    res.Add(s);
                 }
-                return res;
+
+                return (res, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (res, "Error al Cargar Data, Metodo MedicoDAL.Buscar \n" + ex.Message.ToString());
             }
         }
 
-        public  TurnoDTO Buscar(int id)
+        public (TurnoDTO result, string message) Buscar(int id)
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            var s = new TurnoDTO();
+            try
             {
-                List<TurnoDTO> res = new List<TurnoDTO>();
-                var query = db.Turno
-                    .Where(el => el.Id == id)
-                    .First();
-                return new TurnoDTO(
-                    query.Id,
-                    new MedicoDTO(
-                        query.Medico.Id,
-                        new EmpleadoDTO(
-                            query.Medico.Empleado.Id,
-                            new PersonaDTO(
-                                query.Medico.Empleado.Persona.Id,
-                                query.Medico.Empleado.Persona.Dni,
-                                query.Medico.Empleado.Persona.Apellidos,
-                                query.Medico.Empleado.Persona.Nombres,
-                                query.Medico.Empleado.Persona.FechaNacimiento,
-                                query.Medico.Empleado.Persona.Sexo,
-                                query.Medico.Empleado.Persona.CorreoElectronico,
-                                query.Medico.Empleado.Persona.Telefono),
-                            query.Medico.Empleado.Cuil,
-                            query.Medico.Empleado.Usuario,
-                            query.Medico.Empleado.Contraseña,
-                            query.Medico.Empleado.FechaIngreso,
-                            new TipoUsuarioDTO(
-                                query.Medico.Empleado.TipoUsuario.Id,
-                                query.Medico.Empleado.TipoUsuario.Descripcion),
-                            query.Medico.Empleado.Activo),
-                        query.Medico.Matricula,
-                        new EspecialidadDTO(
-                            query.Medico.Especialidad.Id,
-                            query.Medico.Especialidad.Descripcion)),
-                    new PacienteDTO(
-                        query.Paciente.Id,
-                        new PersonaDTO(
-                            query.Paciente.Persona.Id,
-                            query.Paciente.Persona.Dni,
-                            query.Paciente.Persona.Apellidos,
-                            query.Paciente.Persona.Nombres,
-                            query.Paciente.Persona.FechaNacimiento,
-                            query.Paciente.Persona.Sexo,
-                            query.Paciente.Persona.CorreoElectronico,
-                            query.Paciente.Persona.Telefono)),
-                    query.FechaHora,
-                    new CoberturaDTO(
-                        query.Cobertura.Id,
-                        new ObraSocialDTO(
-                            query.Cobertura.ObraSocial.Id,
-                            query.Cobertura.ObraSocial.Nombre,
-                            query.Cobertura.ObraSocial.Estado),
-                        query.Cobertura.Descripcion,
-                        query.Cobertura.Estado),
-                    new TurnoEstadoDTO(
-                        query.TurnoEstado.Id,
-                        query.TurnoEstado.Descripcion));
+                if (id <= 0)
+                    return (s, "Error Input Invalido, Metodo EspecialidadDAL.BuscarById");
+
+                var classKeys = Data.GetObjectKeys(new Turno());
+                var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE TurnoId ='" + id + "'");
+                var (dr, message1) = Data.GetOne(sql, "TurnoDAL.BuscarById");
+                if (dr is null)
+                    return (s, message1);
+
+                s.Id = dr["TurnoId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("TurnoId")) : 0;
+                s.FechaHora = dr["FechaHora"].GetType() != typeof(DBNull) ? dr.GetDateTime(dr.GetOrdinal("FechaHora")) : DateTime.MinValue;
+
+                var idm = dr["MedicoId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("MedicoId")) : 0;
+                if (idm > 0)
+                {
+                    var medico = medicoDAL.Buscar(idm);
+                    if (medico.result != null)
+                        s.Medico = medico.result;
+                }
+
+                var idc = dr["CoberturaId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("CoberturaId")) : 0;
+                if (idc > 0)
+                {
+                    var cobertura = coberturaDAL.Buscar(idc);
+                    if (cobertura.result != null)
+                        s.Cobertura = cobertura.result;
+                }
+
+                var idp = dr["CoberturaId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("CoberturaId")) : 0;
+                if (idp > 0)
+                {
+                    var paciente = pacienteDAL.Buscar(idp);
+                    if (paciente.result != null)
+                        s.Paciente = paciente.result;
+                }
+
+                var ide = dr["EstadoId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("EstadoId")) : 0;
+                if (ide > 0)
+                {
+                    var estado = turnoEstadoDAL.Buscar(ide);
+                    if (estado.result != null)
+                        s.Estado = estado.result;
+                }
+
+                return (s, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (s, "Error al Cargar Data, Metodo TurnoDAL.BuscarById \n" + ex.Message.ToString());
             }
         }
 
-        public  List<TurnoDTO> Buscar(DateTime desde, DateTime hasta)
+        public (List<TurnoDTO> result, string message) Buscar(DateTime desde, DateTime hasta)
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            List<TurnoDTO> res = new List<TurnoDTO>();
+            try
             {
-                List<TurnoDTO> res = new List<TurnoDTO>();
-                var query = db.Turno
-                    .Where(el => DateTime.Compare(el.FechaHora, desde) >= 0 &&
-                        DateTime.Compare(el.FechaHora, hasta) <= 0)
-                    .OrderBy(el => el.FechaHora);
-                foreach (Turno temp in query)
+                var classKeys = Data.GetObjectKeys(new Turno());
+                var join = Data.JoinExpression("INNER", new List<string>() { "Turno" }, new List<string>() { "Medico" }, new List<string>() { "MedicoId" });
+                var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE FechaHora BETWEEN '" + desde + "' AND '" + hasta + "'", OrderBy: "FechaHora");
+                var (dtPC, message) = Data.GetList(sql, "TurnoDAL.BuscarByEmpleadoId");
+                if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
+                    return (res, message);
+
+                foreach (DataRow temp in dtPC.Rows)
                 {
-                    res.Add(new TurnoDTO(
-                        temp.Id,
-                        new MedicoDTO(
-                            temp.Medico.Id,
-                            new EmpleadoDTO(
-                                temp.Medico.Empleado.EmpleadoId,
-                                new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.PersonaId,
-                                    temp.Medico.Empleado.Persona.Dni,
-                                    temp.Medico.Empleado.Persona.Apellidos,
-                                    temp.Medico.Empleado.Persona.Nombres,
-                                    temp.Medico.Empleado.Persona.FechaNacimiento,
-                                    temp.Medico.Empleado.Persona.Sexo,
-                                    temp.Medico.Empleado.Persona.CorreoElectronico,
-                                    temp.Medico.Empleado.Persona.Telefono),
-                                temp.Medico.Empleado.Cuil,
-                                temp.Medico.Empleado.Usuario,
-                                temp.Medico.Empleado.Contraseña,
-                                temp.Medico.Empleado.FechaIngreso,
-                                new TipoUsuarioDTO(
-                                    temp.Medico.Empleado.TipoUsuario.Id,
-                                    temp.Medico.Empleado.TipoUsuario.Descripcion),
-                                temp.Medico.Empleado.Activo),
-                            temp.Medico.Matricula,
-                            new EspecialidadDTO(
-                                temp.Medico.Especialidad.Id,
-                                temp.Medico.Especialidad.Descripcion)),
-                        new PacienteDTO(
-                            temp.Paciente.Id,
-                            new PersonaDTO(
-                                temp.Paciente.Persona.PersonaId,
-                                temp.Paciente.Persona.Dni,
-                                temp.Paciente.Persona.Apellidos,
-                                temp.Paciente.Persona.Nombres,
-                                temp.Paciente.Persona.FechaNacimiento,
-                                temp.Paciente.Persona.Sexo,
-                                temp.Paciente.Persona.CorreoElectronico,
-                                temp.Paciente.Persona.Telefono)),
-                        temp.FechaHora,
-                        new CoberturaDTO(
-                            temp.Cobertura.Id,
-                            new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.ObraSocialId,
-                                temp.Cobertura.ObraSocial.Nombre,
-                                temp.Cobertura.ObraSocial.Estado),
-                            temp.Cobertura.Descripcion,
-                            temp.Cobertura.Estado),
-                        new TurnoEstadoDTO(
-                            temp.TurnoEstado.Id,
-                            temp.TurnoEstado.Descripcion)));
+                    var s = new TurnoDTO();
+                    s.Id = temp["TurnoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["TurnoId"]);
+                    s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
+
+                    var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    if (idm > 0)
+                    {
+                        var medico = medicoDAL.Buscar(idm);
+                        if (medico.result != null)
+                            s.Medico = medico.result;
+                    }
+
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    if (idc > 0)
+                    {
+                        var cobertura = coberturaDAL.Buscar(idc);
+                        if (cobertura.result != null)
+                            s.Cobertura = cobertura.result;
+                    }
+
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    if (idp > 0)
+                    {
+                        var paciente = pacienteDAL.Buscar(idp);
+                        if (paciente.result != null)
+                            s.Paciente = paciente.result;
+                    }
+
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+                    if (ide > 0)
+                    {
+                        var estado = turnoEstadoDAL.Buscar(ide);
+                        if (estado.result != null)
+                            s.Estado = estado.result;
+                    }
+
+                    res.Add(s);
                 }
-                return res;
+
+                return (res, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (res, "Error al Cargar Data, Metodo TurnoDAL.BuscarByEmpleadoId \n" + ex.Message.ToString());
             }
         }
 
-        public  List<TurnoDTO> Buscar(EmpleadoDTO med)
+        public (List<TurnoDTO> result, string message) Buscar(EmpleadoDTO med)
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            List<TurnoDTO> res = new List<TurnoDTO>();
+            try
             {
-                List<TurnoDTO> res = new List<TurnoDTO>();
-                var query = db.Turno
-                    .Where(el => el.Medico.EmpleadoId == med.Id)
-                    .OrderBy(el => el.FechaHora);
-                foreach (Turno temp in query)
+                var classKeys = Data.GetObjectKeys(new Turno());
+                var join = Data.JoinExpression("INNER", new List<string>() { "Turno" }, new List<string>() { "Medico" }, new List<string>() { "MedicoId" });
+                var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE Medico.EmpleadoId ='" + med.Id + "'", OrderBy: "FechaHora");
+                var (dtPC, message) = Data.GetList(sql, "TurnoDAL.BuscarByEmpleadoId");
+                if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
+                    return (res, message);
+
+                foreach (DataRow temp in dtPC.Rows)
                 {
-                    res.Add(new TurnoDTO(
-                        temp.Id,
-                        new MedicoDTO(
-                            temp.Medico.Id,
-                            new EmpleadoDTO(
-                                temp.Medico.Empleado.EmpleadoId,
-                                new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.PersonaId,
-                                    temp.Medico.Empleado.Persona.Dni,
-                                    temp.Medico.Empleado.Persona.Apellidos,
-                                    temp.Medico.Empleado.Persona.Nombres,
-                                    temp.Medico.Empleado.Persona.FechaNacimiento,
-                                    temp.Medico.Empleado.Persona.Sexo,
-                                    temp.Medico.Empleado.Persona.CorreoElectronico,
-                                    temp.Medico.Empleado.Persona.Telefono),
-                                temp.Medico.Empleado.Cuil,
-                                temp.Medico.Empleado.Usuario,
-                                temp.Medico.Empleado.Contraseña,
-                                temp.Medico.Empleado.FechaIngreso,
-                                new TipoUsuarioDTO(
-                                    temp.Medico.Empleado.TipoUsuario.Id,
-                                    temp.Medico.Empleado.TipoUsuario.Descripcion),
-                                temp.Medico.Empleado.Activo),
-                            temp.Medico.Matricula,
-                            new EspecialidadDTO(
-                                temp.Medico.Especialidad.Id,
-                                temp.Medico.Especialidad.Descripcion)),
-                        new PacienteDTO(
-                            temp.Paciente.Id,
-                            new PersonaDTO(
-                                temp.Paciente.Persona.PersonaId,
-                                temp.Paciente.Persona.Dni,
-                                temp.Paciente.Persona.Apellidos,
-                                temp.Paciente.Persona.Nombres,
-                                temp.Paciente.Persona.FechaNacimiento,
-                                temp.Paciente.Persona.Sexo,
-                                temp.Paciente.Persona.CorreoElectronico,
-                                temp.Paciente.Persona.Telefono)),
-                        temp.FechaHora,
-                        new CoberturaDTO(
-                            temp.Cobertura.Id,
-                            new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.ObraSocialId,
-                                temp.Cobertura.ObraSocial.Nombre,
-                                temp.Cobertura.ObraSocial.Estado),
-                            temp.Cobertura.Descripcion,
-                            temp.Cobertura.Estado),
-                        new TurnoEstadoDTO(
-                            temp.TurnoEstado.Id,
-                            temp.TurnoEstado.Descripcion)));
+                    var s = new TurnoDTO();
+                    s.Id = temp["TurnoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["TurnoId"]);
+                    s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
+
+                    var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    if (idm > 0)
+                    {
+                        var medico = medicoDAL.Buscar(idm);
+                        if (medico.result != null)
+                            s.Medico = medico.result;
+                    }
+
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    if (idc > 0)
+                    {
+                        var cobertura = coberturaDAL.Buscar(idc);
+                        if (cobertura.result != null)
+                            s.Cobertura = cobertura.result;
+                    }
+
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    if (idp > 0)
+                    {
+                        var paciente = pacienteDAL.Buscar(idp);
+                        if (paciente.result != null)
+                            s.Paciente = paciente.result;
+                    }
+
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+                    if (ide > 0)
+                    {
+                        var estado = turnoEstadoDAL.Buscar(ide);
+                        if (estado.result != null)
+                            s.Estado = estado.result;
+                    }
+
+                    res.Add(s);
                 }
-                return res;
+
+                return (res, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (res, "Error al Cargar Data, Metodo TurnoDAL.BuscarByEmpleadoId \n" + ex.Message.ToString());
             }
         }
 
-        public  List<TurnoDTO> Buscar(EmpleadoDTO med, DateTime desde, DateTime hasta)
+        public (List<TurnoDTO> result, string message) Buscar(EmpleadoDTO med, DateTime desde, DateTime hasta)
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            List<TurnoDTO> res = new List<TurnoDTO>();
+            try
             {
-                List<TurnoDTO> res = new List<TurnoDTO>();
-                var query = db.Turno
-                    .Where(el => el.Medico.EmpleadoId == med.Id &&
-                        DateTime.Compare(el.FechaHora, desde) >= 0 &&
-                        DateTime.Compare(el.FechaHora, hasta) <= 0)
-                    .OrderBy(el => el.FechaHora);
-                foreach (Turno temp in query)
+                var classKeys = Data.GetObjectKeys(new Turno());
+                var join = Data.JoinExpression("INNER", new List<string>() { "Turno" }, new List<string>() { "Medico" }, new List<string>() { "MedicoId" });
+                var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE Medico.EmpleadoId ='" + med.Id + "' AND FechaHora BETWEEN '" + desde + "' AND '" + hasta + "'", OrderBy: "FechaHora");
+                var (dtPC, message) = Data.GetList(sql, "TurnoDAL.BuscarByEmpleadoId");
+                if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
+                    return (res, message);
+
+                foreach (DataRow temp in dtPC.Rows)
                 {
-                    res.Add(new TurnoDTO(
-                        temp.Id,
-                        new MedicoDTO(
-                            temp.Medico.Id,
-                            new EmpleadoDTO(
-                                temp.Medico.Empleado.EmpleadoId,
-                                new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.PersonaId,
-                                    temp.Medico.Empleado.Persona.Dni,
-                                    temp.Medico.Empleado.Persona.Apellidos,
-                                    temp.Medico.Empleado.Persona.Nombres,
-                                    temp.Medico.Empleado.Persona.FechaNacimiento,
-                                    temp.Medico.Empleado.Persona.Sexo,
-                                    temp.Medico.Empleado.Persona.CorreoElectronico,
-                                    temp.Medico.Empleado.Persona.Telefono),
-                                temp.Medico.Empleado.Cuil,
-                                temp.Medico.Empleado.Usuario,
-                                temp.Medico.Empleado.Contraseña,
-                                temp.Medico.Empleado.FechaIngreso,
-                                new TipoUsuarioDTO(
-                                    temp.Medico.Empleado.TipoUsuario.Id,
-                                    temp.Medico.Empleado.TipoUsuario.Descripcion),
-                                temp.Medico.Empleado.Activo),
-                            temp.Medico.Matricula,
-                            new EspecialidadDTO(
-                                temp.Medico.Especialidad.Id,
-                                temp.Medico.Especialidad.Descripcion)),
-                        new PacienteDTO(
-                            temp.Paciente.Id,
-                            new PersonaDTO(
-                                temp.Paciente.Persona.PersonaId,
-                                temp.Paciente.Persona.Dni,
-                                temp.Paciente.Persona.Apellidos,
-                                temp.Paciente.Persona.Nombres,
-                                temp.Paciente.Persona.FechaNacimiento,
-                                temp.Paciente.Persona.Sexo,
-                                temp.Paciente.Persona.CorreoElectronico,
-                                temp.Paciente.Persona.Telefono)),
-                        temp.FechaHora,
-                        new CoberturaDTO(
-                            temp.Cobertura.Id,
-                            new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.ObraSocialId,
-                                temp.Cobertura.ObraSocial.Nombre,
-                                temp.Cobertura.ObraSocial.Estado),
-                            temp.Cobertura.Descripcion,
-                            temp.Cobertura.Estado),
-                        new TurnoEstadoDTO(
-                            temp.TurnoEstado.Id,
-                            temp.TurnoEstado.Descripcion)));
+                    var s = new TurnoDTO();
+                    s.Id = temp["TurnoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["TurnoId"]);
+                    s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
+
+                    var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    if (idm > 0)
+                    {
+                        var medico = medicoDAL.Buscar(idm);
+                        if (medico.result != null)
+                            s.Medico = medico.result;
+                    }
+
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    if (idc > 0)
+                    {
+                        var cobertura = coberturaDAL.Buscar(idc);
+                        if (cobertura.result != null)
+                            s.Cobertura = cobertura.result;
+                    }
+
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    if (idp > 0)
+                    {
+                        var paciente = pacienteDAL.Buscar(idp);
+                        if (paciente.result != null)
+                            s.Paciente = paciente.result;
+                    }
+
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+                    if (ide > 0)
+                    {
+                        var estado = turnoEstadoDAL.Buscar(ide);
+                        if (estado.result != null)
+                            s.Estado = estado.result;
+                    }
+
+                    res.Add(s);
                 }
-                return res;
+
+                return (res, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (res, "Error al Cargar Data, Metodo TurnoDAL.BuscarByEmpleadoId \n" + ex.Message.ToString());
             }
         }
 
-        public  List<TurnoDTO> Buscar(MedicoDTO med, DateTime dia)
+        public (List<TurnoDTO> result, string message) Buscar(MedicoDTO med, DateTime dia)
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            List<TurnoDTO> res = new List<TurnoDTO>();
+            try
             {
-                List<TurnoDTO> res = new List<TurnoDTO>();
-                var query = db.Turno
-                    .Where(el => el.MedicoId == med.Id &&
-                        el.FechaHora.Year == dia.Year &&
-                        el.FechaHora.Month == dia.Month &&
-                        el.FechaHora.Day == dia.Day)
-                    .OrderBy(el => el.FechaHora);
-                foreach (Turno temp in query)
+                var classKeys = Data.GetObjectKeys(new Turno());
+                var join = Data.JoinExpression("INNER", new List<string>() { "Turno", "Empleado", "Persona" }, new List<string>() { "Medico", "Persona", "Paciente" }, new List<string>() { "MedicoId", "PersonaId", "PersonaId" });
+                var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE MedicoId = '" + med.Id + "' AND FechaHora = '" + dia.ToShortDateString() + "'", OrderBy: "FechaHora");
+                var (dtPC, message) = Data.GetList(sql, "TurnoDAL.BuscarByEmpleadoId");
+                if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
+                    return (res, message);
+
+                foreach (DataRow temp in dtPC.Rows)
                 {
-                    res.Add(new TurnoDTO(
-                        temp.Id,
-                        new MedicoDTO(
-                            temp.Medico.Id,
-                            new EmpleadoDTO(
-                                temp.Medico.Empleado.EmpleadoId,
-                                new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.PersonaId,
-                                    temp.Medico.Empleado.Persona.Dni,
-                                    temp.Medico.Empleado.Persona.Apellidos,
-                                    temp.Medico.Empleado.Persona.Nombres,
-                                    temp.Medico.Empleado.Persona.FechaNacimiento,
-                                    temp.Medico.Empleado.Persona.Sexo,
-                                    temp.Medico.Empleado.Persona.CorreoElectronico,
-                                    temp.Medico.Empleado.Persona.Telefono),
-                                temp.Medico.Empleado.Cuil,
-                                temp.Medico.Empleado.Usuario,
-                                temp.Medico.Empleado.Contraseña,
-                                temp.Medico.Empleado.FechaIngreso,
-                                new TipoUsuarioDTO(
-                                    temp.Medico.Empleado.TipoUsuario.Id,
-                                    temp.Medico.Empleado.TipoUsuario.Descripcion),
-                                temp.Medico.Empleado.Activo),
-                            temp.Medico.Matricula,
-                            new EspecialidadDTO(
-                                temp.Medico.Especialidad.Id,
-                                temp.Medico.Especialidad.Descripcion)),
-                        new PacienteDTO(
-                            temp.Paciente.Id,
-                            new PersonaDTO(
-                                temp.Paciente.Persona.PersonaId,
-                                temp.Paciente.Persona.Dni,
-                                temp.Paciente.Persona.Apellidos,
-                                temp.Paciente.Persona.Nombres,
-                                temp.Paciente.Persona.FechaNacimiento,
-                                temp.Paciente.Persona.Sexo,
-                                temp.Paciente.Persona.CorreoElectronico,
-                                temp.Paciente.Persona.Telefono)),
-                        temp.FechaHora,
-                        new CoberturaDTO(
-                            temp.Cobertura.Id,
-                            new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.ObraSocialId,
-                                temp.Cobertura.ObraSocial.Nombre,
-                                temp.Cobertura.ObraSocial.Estado),
-                            temp.Cobertura.Descripcion,
-                            temp.Cobertura.Estado),
-                        new TurnoEstadoDTO(
-                            temp.TurnoEstado.Id,
-                            temp.TurnoEstado.Descripcion)));
+                    var s = new TurnoDTO();
+                    s.Id = temp["TurnoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["TurnoId"]);
+                    s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
+
+                    var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    if (idm > 0)
+                    {
+                        var medico = medicoDAL.Buscar(idm);
+                        if (medico.result != null)
+                            s.Medico = medico.result;
+                    }
+
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    if (idc > 0)
+                    {
+                        var cobertura = coberturaDAL.Buscar(idc);
+                        if (cobertura.result != null)
+                            s.Cobertura = cobertura.result;
+                    }
+
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    if (idp > 0)
+                    {
+                        var paciente = pacienteDAL.Buscar(idp);
+                        if (paciente.result != null)
+                            s.Paciente = paciente.result;
+                    }
+
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+                    if (ide > 0)
+                    {
+                        var estado = turnoEstadoDAL.Buscar(ide);
+                        if (estado.result != null)
+                            s.Estado = estado.result;
+                    }
+
+                    res.Add(s);
                 }
-                return res;
+
+                return (res, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (res, "Error al Cargar Data, Metodo TurnoDAL.BuscarByEmpleadoId \n" + ex.Message.ToString());
             }
         }
 
-        public  List<TurnoDTO> BuscarApeNom(string apenom)
+        public (List<TurnoDTO> result, string message) BuscarApeNom(string apenom)
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            List<TurnoDTO> res = new List<TurnoDTO>();
+            try
             {
-                List<TurnoDTO> res = new List<TurnoDTO>();
-                var query = db.Turno
-                    .Where(el => el.Medico.Empleado.Persona.Apellidos.Contains(apenom) ||
-                        el.Medico.Empleado.Persona.Nombres.Contains(apenom) ||
-                        el.Paciente.Persona.Apellidos.Contains(apenom) ||
-                        el.Paciente.Persona.Nombres.Contains(apenom))
-                    .OrderBy(el => el.FechaHora);
-                foreach (Turno temp in query)
+                var classKeys = Data.GetObjectKeys(new Turno());
+                var join = Data.JoinExpression("INNER", new List<string>() { "Turno", "Empleado", "Persona" }, new List<string>() { "Medico", "Persona", "Paciente" }, new List<string>() { "MedicoId", "PersonaId", "PersonaId" });
+                var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE Medico.Empleado.Persona.Apellidos LIKE '%" + apenom + "%'"
+                    + "OR Medico.Empleado.Persona.Nombres LIKE '%" + apenom + "%' OR Paciente.Persona.Apellidos LIKE '%" + apenom
+                    + "%' OR Paciente.Persona.Nombres LIKE '%" + apenom + "%'", OrderBy: "FechaHora");
+                var (dtPC, message) = Data.GetList(sql, "TurnoDAL.BuscarByEmpleadoId");
+                if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
+                    return (res, message);
+
+                foreach (DataRow temp in dtPC.Rows)
                 {
-                    res.Add(new TurnoDTO(
-                        temp.Id,
-                        new MedicoDTO(
-                            temp.Medico.Id,
-                            new EmpleadoDTO(
-                                temp.Medico.Empleado.EmpleadoId,
-                                new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.PersonaId,
-                                    temp.Medico.Empleado.Persona.Dni,
-                                    temp.Medico.Empleado.Persona.Apellidos,
-                                    temp.Medico.Empleado.Persona.Nombres,
-                                    temp.Medico.Empleado.Persona.FechaNacimiento,
-                                    temp.Medico.Empleado.Persona.Sexo,
-                                    temp.Medico.Empleado.Persona.CorreoElectronico,
-                                    temp.Medico.Empleado.Persona.Telefono),
-                                temp.Medico.Empleado.Cuil,
-                                temp.Medico.Empleado.Usuario,
-                                temp.Medico.Empleado.Contraseña,
-                                temp.Medico.Empleado.FechaIngreso,
-                                new TipoUsuarioDTO(
-                                    temp.Medico.Empleado.TipoUsuario.Id,
-                                    temp.Medico.Empleado.TipoUsuario.Descripcion),
-                                temp.Medico.Empleado.Activo),
-                            temp.Medico.Matricula,
-                            new EspecialidadDTO(
-                                temp.Medico.Especialidad.Id,
-                                temp.Medico.Especialidad.Descripcion)),
-                        new PacienteDTO(
-                            temp.Paciente.Id,
-                            new PersonaDTO(
-                                temp.Paciente.Persona.PersonaId,
-                                temp.Paciente.Persona.Dni,
-                                temp.Paciente.Persona.Apellidos,
-                                temp.Paciente.Persona.Nombres,
-                                temp.Paciente.Persona.FechaNacimiento,
-                                temp.Paciente.Persona.Sexo,
-                                temp.Paciente.Persona.CorreoElectronico,
-                                temp.Paciente.Persona.Telefono)),
-                        temp.FechaHora,
-                        new CoberturaDTO(
-                            temp.Cobertura.Id,
-                            new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.ObraSocialId,
-                                temp.Cobertura.ObraSocial.Nombre,
-                                temp.Cobertura.ObraSocial.Estado),
-                            temp.Cobertura.Descripcion,
-                            temp.Cobertura.Estado),
-                        new TurnoEstadoDTO(
-                            temp.TurnoEstado.Id,
-                            temp.TurnoEstado.Descripcion)));
+                    var s = new TurnoDTO();
+                    s.Id = temp["TurnoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["TurnoId"]);
+                    s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
+
+                    var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    if (idm > 0)
+                    {
+                        var medico = medicoDAL.Buscar(idm);
+                        if (medico.result != null)
+                            s.Medico = medico.result;
+                    }
+
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    if (idc > 0)
+                    {
+                        var cobertura = coberturaDAL.Buscar(idc);
+                        if (cobertura.result != null)
+                            s.Cobertura = cobertura.result;
+                    }
+
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    if (idp > 0)
+                    {
+                        var paciente = pacienteDAL.Buscar(idp);
+                        if (paciente.result != null)
+                            s.Paciente = paciente.result;
+                    }
+
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+                    if (ide > 0)
+                    {
+                        var estado = turnoEstadoDAL.Buscar(ide);
+                        if (estado.result != null)
+                            s.Estado = estado.result;
+                    }
+
+                    res.Add(s);
                 }
-                return res;
+
+                return (res, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (res, "Error al Cargar Data, Metodo TurnoDAL.BuscarByEmpleadoId \n" + ex.Message.ToString());
             }
         }
 
-        public  List<TurnoDTO> BuscarApeNom(string apenom, DateTime desde, DateTime hasta)
+        public (List<TurnoDTO> result, string message) BuscarApeNom(string apenom, DateTime desde, DateTime hasta)
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            List<TurnoDTO> res = new List<TurnoDTO>();
+            try
             {
-                List<TurnoDTO> res = new List<TurnoDTO>();
-                var query = db.Turno
-                    .Where(el => (el.Medico.Empleado.Persona.Apellidos.Contains(apenom) ||
-                        el.Medico.Empleado.Persona.Nombres.Contains(apenom) ||
-                        el.Paciente.Persona.Apellidos.Contains(apenom) ||
-                        el.Paciente.Persona.Nombres.Contains(apenom)) &&
-                        DateTime.Compare(el.FechaHora, desde) >= 0 &&
-                        DateTime.Compare(el.FechaHora, hasta) <= 0)
-                    .OrderBy(el => el.FechaHora);
-                foreach (Turno temp in query)
+                var classKeys = Data.GetObjectKeys(new Turno());
+                var join = Data.JoinExpression("INNER", new List<string>() { "Turno", "Empleado", "Persona" }, new List<string>() { "Medico", "Persona", "Paciente" }, new List<string>() { "MedicoId", "PersonaId", "PersonaId" });
+                var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE Medico.Empleado.Persona.Apellidos LIKE '%" + apenom + "%'"
+                    + "OR Medico.Empleado.Persona.Nombres LIKE '%" + apenom + "%' OR Paciente.Persona.Apellidos LIKE '%" + apenom
+                    + "%' OR Paciente.Persona.Nombres LIKE '%" + apenom + "%' AND FechaHora BETWEEN '" + desde + "' AND '" + hasta + "'", OrderBy: "FechaHora");
+                var (dtPC, message) = Data.GetList(sql, "TurnoDAL.BuscarByEmpleadoId");
+                if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
+                    return (res, message);
+
+                foreach (DataRow temp in dtPC.Rows)
                 {
-                    res.Add(new TurnoDTO(
-                        temp.Id,
-                        new MedicoDTO(
-                            temp.Medico.Id,
-                            new EmpleadoDTO(
-                                temp.Medico.Empleado.EmpleadoId,
-                                new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.PersonaId,
-                                    temp.Medico.Empleado.Persona.Dni,
-                                    temp.Medico.Empleado.Persona.Apellidos,
-                                    temp.Medico.Empleado.Persona.Nombres,
-                                    temp.Medico.Empleado.Persona.FechaNacimiento,
-                                    temp.Medico.Empleado.Persona.Sexo,
-                                    temp.Medico.Empleado.Persona.CorreoElectronico,
-                                    temp.Medico.Empleado.Persona.Telefono),
-                                temp.Medico.Empleado.Cuil,
-                                temp.Medico.Empleado.Usuario,
-                                temp.Medico.Empleado.Contraseña,
-                                temp.Medico.Empleado.FechaIngreso,
-                                new TipoUsuarioDTO(
-                                    temp.Medico.Empleado.TipoUsuario.Id,
-                                    temp.Medico.Empleado.TipoUsuario.Descripcion),
-                                temp.Medico.Empleado.Activo),
-                            temp.Medico.Matricula,
-                            new EspecialidadDTO(
-                                temp.Medico.Especialidad.Id,
-                                temp.Medico.Especialidad.Descripcion)),
-                        new PacienteDTO(
-                            temp.Paciente.Id,
-                            new PersonaDTO(
-                                temp.Paciente.Persona.PersonaId,
-                                temp.Paciente.Persona.Dni,
-                                temp.Paciente.Persona.Apellidos,
-                                temp.Paciente.Persona.Nombres,
-                                temp.Paciente.Persona.FechaNacimiento,
-                                temp.Paciente.Persona.Sexo,
-                                temp.Paciente.Persona.CorreoElectronico,
-                                temp.Paciente.Persona.Telefono)),
-                        temp.FechaHora,
-                        new CoberturaDTO(
-                            temp.Cobertura.Id,
-                            new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.ObraSocialId,
-                                temp.Cobertura.ObraSocial.Nombre,
-                                temp.Cobertura.ObraSocial.Estado),
-                            temp.Cobertura.Descripcion,
-                            temp.Cobertura.Estado),
-                        new TurnoEstadoDTO(
-                            temp.TurnoEstado.Id,
-                            temp.TurnoEstado.Descripcion)));
+                    var s = new TurnoDTO();
+                    s.Id = temp["TurnoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["TurnoId"]);
+                    s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
+
+                    var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    if (idm > 0)
+                    {
+                        var medico = medicoDAL.Buscar(idm);
+                        if (medico.result != null)
+                            s.Medico = medico.result;
+                    }
+
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    if (idc > 0)
+                    {
+                        var cobertura = coberturaDAL.Buscar(idc);
+                        if (cobertura.result != null)
+                            s.Cobertura = cobertura.result;
+                    }
+
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    if (idp > 0)
+                    {
+                        var paciente = pacienteDAL.Buscar(idp);
+                        if (paciente.result != null)
+                            s.Paciente = paciente.result;
+                    }
+
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+                    if (ide > 0)
+                    {
+                        var estado = turnoEstadoDAL.Buscar(ide);
+                        if (estado.result != null)
+                            s.Estado = estado.result;
+                    }
+
+                    res.Add(s);
                 }
-                return res;
+
+                return (res, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (res, "Error al Cargar Data, Metodo TurnoDAL.BuscarByEmpleadoId \n" + ex.Message.ToString());
             }
         }
 
-        public  List<TurnoDTO> BuscarApeNom(EmpleadoDTO med, string apenom)
+        public (List<TurnoDTO> result, string message) BuscarApeNom(EmpleadoDTO med, string apenom)
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            List<TurnoDTO> res = new List<TurnoDTO>();
+            try
             {
-                List<TurnoDTO> res = new List<TurnoDTO>();
-                var query = db.Turno
-                    .Where(el => el.Medico.EmpleadoId == med.Id &&
-                        (el.Paciente.Persona.Apellidos.Contains(apenom) ||
-                        el.Paciente.Persona.Nombres.Contains(apenom)))
-                    .OrderBy(el => el.FechaHora);
-                foreach (Turno temp in query)
+                var classKeys = Data.GetObjectKeys(new Turno());
+                var join = Data.JoinExpression("INNER", new List<string>() { "Turno", "Empleado", "Persona" }, new List<string>() { "Medico", "Persona", "Paciente" }, new List<string>() { "MedicoId", "PersonaId", "PersonaId" });
+                var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE Medico.EmpleadoId = " + med.Id + "OR Paciente.Persona.Apellidos LIKE '%" + apenom + "%' OR Paciente.Persona.Nombres LIKE '%" + apenom + "%'", OrderBy: "FechaHora");
+                var (dtPC, message) = Data.GetList(sql, "TurnoDAL.BuscarByEmpleadoId");
+                if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
+                    return (res, message);
+
+                foreach (DataRow temp in dtPC.Rows)
                 {
-                    res.Add(new TurnoDTO(
-                        temp.Id,
-                        new MedicoDTO(
-                            temp.Medico.Id,
-                            new EmpleadoDTO(
-                                temp.Medico.Empleado.EmpleadoId,
-                                new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.PersonaId,
-                                    temp.Medico.Empleado.Persona.Dni,
-                                    temp.Medico.Empleado.Persona.Apellidos,
-                                    temp.Medico.Empleado.Persona.Nombres,
-                                    temp.Medico.Empleado.Persona.FechaNacimiento,
-                                    temp.Medico.Empleado.Persona.Sexo,
-                                    temp.Medico.Empleado.Persona.CorreoElectronico,
-                                    temp.Medico.Empleado.Persona.Telefono),
-                                temp.Medico.Empleado.Cuil,
-                                temp.Medico.Empleado.Usuario,
-                                temp.Medico.Empleado.Contraseña,
-                                temp.Medico.Empleado.FechaIngreso,
-                                new TipoUsuarioDTO(
-                                    temp.Medico.Empleado.TipoUsuario.Id,
-                                    temp.Medico.Empleado.TipoUsuario.Descripcion),
-                                temp.Medico.Empleado.Activo),
-                            temp.Medico.Matricula,
-                            new EspecialidadDTO(
-                                temp.Medico.Especialidad.Id,
-                                temp.Medico.Especialidad.Descripcion)),
-                        new PacienteDTO(
-                            temp.Paciente.Id,
-                            new PersonaDTO(
-                                temp.Paciente.Persona.PersonaId,
-                                temp.Paciente.Persona.Dni,
-                                temp.Paciente.Persona.Apellidos,
-                                temp.Paciente.Persona.Nombres,
-                                temp.Paciente.Persona.FechaNacimiento,
-                                temp.Paciente.Persona.Sexo,
-                                temp.Paciente.Persona.CorreoElectronico,
-                                temp.Paciente.Persona.Telefono)),
-                        temp.FechaHora,
-                        new CoberturaDTO(
-                            temp.Cobertura.Id,
-                            new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.ObraSocialId,
-                                temp.Cobertura.ObraSocial.Nombre,
-                                temp.Cobertura.ObraSocial.Estado),
-                            temp.Cobertura.Descripcion,
-                            temp.Cobertura.Estado),
-                        new TurnoEstadoDTO(
-                            temp.TurnoEstado.Id,
-                            temp.TurnoEstado.Descripcion)));
+                    var s = new TurnoDTO();
+                    s.Id = temp["TurnoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["TurnoId"]);
+                    s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
+
+                    var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    if (idm > 0)
+                    {
+                        var medico = medicoDAL.Buscar(idm);
+                        if (medico.result != null)
+                            s.Medico = medico.result;
+                    }
+
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    if (idc > 0)
+                    {
+                        var cobertura = coberturaDAL.Buscar(idc);
+                        if (cobertura.result != null)
+                            s.Cobertura = cobertura.result;
+                    }
+
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    if (idp > 0)
+                    {
+                        var paciente = pacienteDAL.Buscar(idp);
+                        if (paciente.result != null)
+                            s.Paciente = paciente.result;
+                    }
+
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+                    if (ide > 0)
+                    {
+                        var estado = turnoEstadoDAL.Buscar(ide);
+                        if (estado.result != null)
+                            s.Estado = estado.result;
+                    }
+
+                    res.Add(s);
                 }
-                return res;
+
+                return (res, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (res, "Error al Cargar Data, Metodo TurnoDAL.BuscarByEmpleadoId \n" + ex.Message.ToString());
             }
         }
 
-        public  List<TurnoDTO> BuscarApeNom(EmpleadoDTO med, string apenom, DateTime desde, DateTime hasta)
+        public (List<TurnoDTO> result, string message) BuscarApeNom(EmpleadoDTO med, string apenom, DateTime desde, DateTime hasta)
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            List<TurnoDTO> res = new List<TurnoDTO>();
+            try
             {
-                List<TurnoDTO> res = new List<TurnoDTO>();
-                var query = db.Turno
-                    .Where(el => (el.Medico.EmpleadoId == med.Id &&
-                        (el.Paciente.Persona.Apellidos.Contains(apenom) ||
-                        el.Paciente.Persona.Nombres.Contains(apenom))) &&
-                        DateTime.Compare(el.FechaHora, desde) >= 0 &&
-                        DateTime.Compare(el.FechaHora, hasta) <= 0)
-                    .OrderBy(el => el.FechaHora);
-                foreach (Turno temp in query)
+                var classKeys = Data.GetObjectKeys(new Turno());
+                var join = Data.JoinExpression("INNER", new List<string>() { "Turno", "Empleado", "Persona" }, new List<string>() { "Medico", "Persona", "Paciente" }, new List<string>() { "MedicoId", "PersonaId", "PersonaId" });
+                var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE Medico.EmpleadoId = " + med.Id + " AND Medico.Empleado.Persona.Apellidos LIKE '%" + apenom + "%'"
+                    + "OR Medico.Empleado.Persona.Nombres LIKE '%" + apenom + "%' OR Paciente.Persona.Apellidos LIKE '%" + apenom
+                    + "%' OR Paciente.Persona.Nombres LIKE '%" + apenom + "%' AND FechaHora BETWEEN '" + desde + "' AND '" + hasta + "'", OrderBy: "FechaHora");
+                var (dtPC, message) = Data.GetList(sql, "TurnoDAL.BuscarByEmpleadoId");
+                if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
+                    return (res, message);
+
+                foreach (DataRow temp in dtPC.Rows)
                 {
-                    res.Add(new TurnoDTO(
-                        temp.Id,
-                        new MedicoDTO(
-                            temp.Medico.Id,
-                            new EmpleadoDTO(
-                                temp.Medico.Empleado.EmpleadoId,
-                                new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.PersonaId,
-                                    temp.Medico.Empleado.Persona.Dni,
-                                    temp.Medico.Empleado.Persona.Apellidos,
-                                    temp.Medico.Empleado.Persona.Nombres,
-                                    temp.Medico.Empleado.Persona.FechaNacimiento,
-                                    temp.Medico.Empleado.Persona.Sexo,
-                                    temp.Medico.Empleado.Persona.CorreoElectronico,
-                                    temp.Medico.Empleado.Persona.Telefono),
-                                temp.Medico.Empleado.Cuil,
-                                temp.Medico.Empleado.Usuario,
-                                temp.Medico.Empleado.Contraseña,
-                                temp.Medico.Empleado.FechaIngreso,
-                                new TipoUsuarioDTO(
-                                    temp.Medico.Empleado.TipoUsuario.Id,
-                                    temp.Medico.Empleado.TipoUsuario.Descripcion),
-                                temp.Medico.Empleado.Activo),
-                            temp.Medico.Matricula,
-                            new EspecialidadDTO(
-                                temp.Medico.Especialidad.Id,
-                                temp.Medico.Especialidad.Descripcion)),
-                        new PacienteDTO(
-                            temp.Paciente.Id,
-                            new PersonaDTO(
-                                temp.Paciente.Persona.PersonaId,
-                                temp.Paciente.Persona.Dni,
-                                temp.Paciente.Persona.Apellidos,
-                                temp.Paciente.Persona.Nombres,
-                                temp.Paciente.Persona.FechaNacimiento,
-                                temp.Paciente.Persona.Sexo,
-                                temp.Paciente.Persona.CorreoElectronico,
-                                temp.Paciente.Persona.Telefono)),
-                        temp.FechaHora,
-                        new CoberturaDTO(
-                            temp.Cobertura.Id,
-                            new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.ObraSocialId,
-                                temp.Cobertura.ObraSocial.Nombre,
-                                temp.Cobertura.ObraSocial.Estado),
-                            temp.Cobertura.Descripcion,
-                            temp.Cobertura.Estado),
-                        new TurnoEstadoDTO(
-                            temp.TurnoEstado.Id,
-                            temp.TurnoEstado.Descripcion)));
+                    var s = new TurnoDTO();
+                    s.Id = temp["TurnoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["TurnoId"]);
+                    s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
+
+                    var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    if (idm > 0)
+                    {
+                        var medico = medicoDAL.Buscar(idm);
+                        if (medico.result != null)
+                            s.Medico = medico.result;
+                    }
+
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    if (idc > 0)
+                    {
+                        var cobertura = coberturaDAL.Buscar(idc);
+                        if (cobertura.result != null)
+                            s.Cobertura = cobertura.result;
+                    }
+
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    if (idp > 0)
+                    {
+                        var paciente = pacienteDAL.Buscar(idp);
+                        if (paciente.result != null)
+                            s.Paciente = paciente.result;
+                    }
+
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+                    if (ide > 0)
+                    {
+                        var estado = turnoEstadoDAL.Buscar(ide);
+                        if (estado.result != null)
+                            s.Estado = estado.result;
+                    }
+
+                    res.Add(s);
                 }
-                return res;
+
+                return (res, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (res, "Error al Cargar Data, Metodo TurnoDAL.BuscarByEmpleadoId \n" + ex.Message.ToString());
             }
         }
 
-        public  List<TurnoDTO> BuscarDni(string dni)
+        public (List<TurnoDTO> result, string message) BuscarDni(string dni)
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            List<TurnoDTO> res = new List<TurnoDTO>();
+            try
             {
-                List<TurnoDTO> res = new List<TurnoDTO>();
-                var query = db.Turno
-                    .Where(el => el.Medico.Empleado.Persona.Dni.Contains(dni) ||
-                        el.Paciente.Persona.Dni.Contains(dni))
-                    .OrderBy(el => el.FechaHora);
-                foreach (Turno temp in query)
+                var classKeys = Data.GetObjectKeys(new Turno());
+                var join = Data.JoinExpression("INNER", new List<string>() { "Turno", "Empleado", "Persona" }, new List<string>() { "Medico", "Persona", "Paciente" }, new List<string>() { "MedicoId", "PersonaId", "PersonaId" });
+                var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE Medico.Empleado.Persona.Dni LIKE '%" + dni + "%'"
+                    + "OR Paciente.Persona.Dni LIKE '%" + dni + "%'", OrderBy: "FechaHora");
+                var (dtPC, message) = Data.GetList(sql, "TurnoDAL.BuscarDni");
+                if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
+                    return (res, message);
+
+                foreach (DataRow temp in dtPC.Rows)
                 {
-                    res.Add(new TurnoDTO(
-                        temp.Id,
-                        new MedicoDTO(
-                            temp.Medico.Id,
-                            new EmpleadoDTO(
-                                temp.Medico.Empleado.EmpleadoId,
-                                new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.PersonaId,
-                                    temp.Medico.Empleado.Persona.Dni,
-                                    temp.Medico.Empleado.Persona.Apellidos,
-                                    temp.Medico.Empleado.Persona.Nombres,
-                                    temp.Medico.Empleado.Persona.FechaNacimiento,
-                                    temp.Medico.Empleado.Persona.Sexo,
-                                    temp.Medico.Empleado.Persona.CorreoElectronico,
-                                    temp.Medico.Empleado.Persona.Telefono),
-                                temp.Medico.Empleado.Cuil,
-                                temp.Medico.Empleado.Usuario,
-                                temp.Medico.Empleado.Contraseña,
-                                temp.Medico.Empleado.FechaIngreso,
-                                new TipoUsuarioDTO(
-                                    temp.Medico.Empleado.TipoUsuario.Id,
-                                    temp.Medico.Empleado.TipoUsuario.Descripcion),
-                                temp.Medico.Empleado.Activo),
-                            temp.Medico.Matricula,
-                            new EspecialidadDTO(
-                                temp.Medico.Especialidad.Id,
-                                temp.Medico.Especialidad.Descripcion)),
-                        new PacienteDTO(
-                            temp.Paciente.Id,
-                            new PersonaDTO(
-                                temp.Paciente.Persona.PersonaId,
-                                temp.Paciente.Persona.Dni,
-                                temp.Paciente.Persona.Apellidos,
-                                temp.Paciente.Persona.Nombres,
-                                temp.Paciente.Persona.FechaNacimiento,
-                                temp.Paciente.Persona.Sexo,
-                                temp.Paciente.Persona.CorreoElectronico,
-                                temp.Paciente.Persona.Telefono)),
-                        temp.FechaHora,
-                        new CoberturaDTO(
-                            temp.Cobertura.Id,
-                            new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.ObraSocialId,
-                                temp.Cobertura.ObraSocial.Nombre,
-                                temp.Cobertura.ObraSocial.Estado),
-                            temp.Cobertura.Descripcion,
-                            temp.Cobertura.Estado),
-                        new TurnoEstadoDTO(
-                            temp.TurnoEstado.Id,
-                            temp.TurnoEstado.Descripcion)));
+                    var s = new TurnoDTO();
+                    s.Id = temp["TurnoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["TurnoId"]);
+                    s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
+
+                    var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    if (idm > 0)
+                    {
+                        var medico = medicoDAL.Buscar(idm);
+                        if (medico.result != null)
+                            s.Medico = medico.result;
+                    }
+
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    if (idc > 0)
+                    {
+                        var cobertura = coberturaDAL.Buscar(idc);
+                        if (cobertura.result != null)
+                            s.Cobertura = cobertura.result;
+                    }
+
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    if (idp > 0)
+                    {
+                        var paciente = pacienteDAL.Buscar(idp);
+                        if (paciente.result != null)
+                            s.Paciente = paciente.result;
+                    }
+
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+                    if (ide > 0)
+                    {
+                        var estado = turnoEstadoDAL.Buscar(ide);
+                        if (estado.result != null)
+                            s.Estado = estado.result;
+                    }
+
+                    res.Add(s);
                 }
-                return res;
+
+                return (res, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (res, "Error al Cargar Data, Metodo TurnoDAL.BuscarDni \n" + ex.Message.ToString());
             }
         }
 
-        public  List<TurnoDTO> BuscarDni(string dni, DateTime desde, DateTime hasta)
+        public (List<TurnoDTO> result, string message) BuscarDni(string dni, DateTime desde, DateTime hasta)
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            List<TurnoDTO> res = new List<TurnoDTO>();
+            try
             {
-                List<TurnoDTO> res = new List<TurnoDTO>();
-                var query = db.Turno
-                    .Where(el => (el.Medico.Empleado.Persona.Dni.Contains(dni) ||
-                        el.Paciente.Persona.Dni.Contains(dni)) &&
-                        DateTime.Compare(el.FechaHora, desde) >= 0 &&
-                        DateTime.Compare(el.FechaHora, hasta) <= 0)
-                    .OrderBy(el => el.FechaHora);
-                foreach (Turno temp in query)
+                var classKeys = Data.GetObjectKeys(new Turno());
+                var join = Data.JoinExpression("INNER", new List<string>() { "Turno", "Empleado", "Persona" }, new List<string>() { "Medico", "Persona", "Paciente" }, new List<string>() { "MedicoId", "PersonaId", "PersonaId" });
+                var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE Medico.Empleado.Persona.Dni LIKE '%" + dni + "%'"
+                    + "OR Paciente.Persona.Dni LIKE '%" + dni + "%' AND FechaHora BETWEEN '" + desde + "' AND '" + hasta + "'", OrderBy: "FechaHora");
+                var (dtPC, message) = Data.GetList(sql, "TurnoDAL.BuscarDni");
+                if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
+                    return (res, message);
+
+                foreach (DataRow temp in dtPC.Rows)
                 {
-                    res.Add(new TurnoDTO(
-                        temp.Id,
-                        new MedicoDTO(
-                            temp.Medico.Id,
-                            new EmpleadoDTO(
-                                temp.Medico.Empleado.EmpleadoId,
-                                new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.PersonaId,
-                                    temp.Medico.Empleado.Persona.Dni,
-                                    temp.Medico.Empleado.Persona.Apellidos,
-                                    temp.Medico.Empleado.Persona.Nombres,
-                                    temp.Medico.Empleado.Persona.FechaNacimiento,
-                                    temp.Medico.Empleado.Persona.Sexo,
-                                    temp.Medico.Empleado.Persona.CorreoElectronico,
-                                    temp.Medico.Empleado.Persona.Telefono),
-                                temp.Medico.Empleado.Cuil,
-                                temp.Medico.Empleado.Usuario,
-                                temp.Medico.Empleado.Contraseña,
-                                temp.Medico.Empleado.FechaIngreso,
-                                new TipoUsuarioDTO(
-                                    temp.Medico.Empleado.TipoUsuario.Id,
-                                    temp.Medico.Empleado.TipoUsuario.Descripcion),
-                                temp.Medico.Empleado.Activo),
-                            temp.Medico.Matricula,
-                            new EspecialidadDTO(
-                                temp.Medico.Especialidad.Id,
-                                temp.Medico.Especialidad.Descripcion)),
-                        new PacienteDTO(
-                            temp.Paciente.Id,
-                            new PersonaDTO(
-                                temp.Paciente.Persona.PersonaId,
-                                temp.Paciente.Persona.Dni,
-                                temp.Paciente.Persona.Apellidos,
-                                temp.Paciente.Persona.Nombres,
-                                temp.Paciente.Persona.FechaNacimiento,
-                                temp.Paciente.Persona.Sexo,
-                                temp.Paciente.Persona.CorreoElectronico,
-                                temp.Paciente.Persona.Telefono)),
-                        temp.FechaHora,
-                        new CoberturaDTO(
-                            temp.Cobertura.Id,
-                            new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.ObraSocialId,
-                                temp.Cobertura.ObraSocial.Nombre,
-                                temp.Cobertura.ObraSocial.Estado),
-                            temp.Cobertura.Descripcion,
-                            temp.Cobertura.Estado),
-                        new TurnoEstadoDTO(
-                            temp.TurnoEstado.Id,
-                            temp.TurnoEstado.Descripcion)));
+                    var s = new TurnoDTO();
+                    s.Id = temp["TurnoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["TurnoId"]);
+                    s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
+
+                    var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    if (idm > 0)
+                    {
+                        var medico = medicoDAL.Buscar(idm);
+                        if (medico.result != null)
+                            s.Medico = medico.result;
+                    }
+
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    if (idc > 0)
+                    {
+                        var cobertura = coberturaDAL.Buscar(idc);
+                        if (cobertura.result != null)
+                            s.Cobertura = cobertura.result;
+                    }
+
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    if (idp > 0)
+                    {
+                        var paciente = pacienteDAL.Buscar(idp);
+                        if (paciente.result != null)
+                            s.Paciente = paciente.result;
+                    }
+
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+                    if (ide > 0)
+                    {
+                        var estado = turnoEstadoDAL.Buscar(ide);
+                        if (estado.result != null)
+                            s.Estado = estado.result;
+                    }
+
+                    res.Add(s);
                 }
-                return res;
+
+                return (res, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (res, "Error al Cargar Data, Metodo TurnoDAL.BuscarDni \n" + ex.Message.ToString());
             }
         }
 
-        public  List<TurnoDTO> BuscarDni(EmpleadoDTO med, string dni)
+        public (List<TurnoDTO> result, string message) BuscarDni(EmpleadoDTO med, string dni)
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            List<TurnoDTO> res = new List<TurnoDTO>();
+            try
             {
-                List<TurnoDTO> res = new List<TurnoDTO>();
-                var query = db.Turno
-                    .Where(el => el.Medico.EmpleadoId == med.Id &&
-                        el.Paciente.Persona.Dni.Contains(dni))
-                    .OrderBy(el => el.FechaHora);
-                foreach (Turno temp in query)
+                var classKeys = Data.GetObjectKeys(new Turno());
+                var join = Data.JoinExpression("INNER", new List<string>() { "Turno", "Empleado", "Persona" }, new List<string>() { "Medico", "Persona", "Paciente" }, new List<string>() { "MedicoId", "PersonaId", "PersonaId" });
+                var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE Medico.EmpleadoId = '" + med.Id + "' AND Medico.Empleado.Persona.Dni LIKE '%" + dni + "%'"
+                    + "OR Paciente.Persona.Dni LIKE '%" + dni + "%'", OrderBy: "FechaHora");
+                var (dtPC, message) = Data.GetList(sql, "TurnoDAL.BuscarDni");
+                if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
+                    return (res, message);
+
+                foreach (DataRow temp in dtPC.Rows)
                 {
-                    res.Add(new TurnoDTO(
-                        temp.Id,
-                        new MedicoDTO(
-                            temp.Medico.Id,
-                            new EmpleadoDTO(
-                                temp.Medico.Empleado.EmpleadoId,
-                                new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.PersonaId,
-                                    temp.Medico.Empleado.Persona.Dni,
-                                    temp.Medico.Empleado.Persona.Apellidos,
-                                    temp.Medico.Empleado.Persona.Nombres,
-                                    temp.Medico.Empleado.Persona.FechaNacimiento,
-                                    temp.Medico.Empleado.Persona.Sexo,
-                                    temp.Medico.Empleado.Persona.CorreoElectronico,
-                                    temp.Medico.Empleado.Persona.Telefono),
-                                temp.Medico.Empleado.Cuil,
-                                temp.Medico.Empleado.Usuario,
-                                temp.Medico.Empleado.Contraseña,
-                                temp.Medico.Empleado.FechaIngreso,
-                                new TipoUsuarioDTO(
-                                    temp.Medico.Empleado.TipoUsuario.Id,
-                                    temp.Medico.Empleado.TipoUsuario.Descripcion),
-                                temp.Medico.Empleado.Activo),
-                            temp.Medico.Matricula,
-                            new EspecialidadDTO(
-                                temp.Medico.Especialidad.Id,
-                                temp.Medico.Especialidad.Descripcion)),
-                        new PacienteDTO(
-                            temp.Paciente.Id,
-                            new PersonaDTO(
-                                temp.Paciente.Persona.PersonaId,
-                                temp.Paciente.Persona.Dni,
-                                temp.Paciente.Persona.Apellidos,
-                                temp.Paciente.Persona.Nombres,
-                                temp.Paciente.Persona.FechaNacimiento,
-                                temp.Paciente.Persona.Sexo,
-                                temp.Paciente.Persona.CorreoElectronico,
-                                temp.Paciente.Persona.Telefono)),
-                        temp.FechaHora,
-                        new CoberturaDTO(
-                            temp.Cobertura.Id,
-                            new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.ObraSocialId,
-                                temp.Cobertura.ObraSocial.Nombre,
-                                temp.Cobertura.ObraSocial.Estado),
-                            temp.Cobertura.Descripcion,
-                            temp.Cobertura.Estado),
-                        new TurnoEstadoDTO(
-                            temp.TurnoEstado.Id,
-                            temp.TurnoEstado.Descripcion)));
+                    var s = new TurnoDTO();
+                    s.Id = temp["TurnoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["TurnoId"]);
+                    s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
+
+                    var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    if (idm > 0)
+                    {
+                        var medico = medicoDAL.Buscar(idm);
+                        if (medico.result != null)
+                            s.Medico = medico.result;
+                    }
+
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    if (idc > 0)
+                    {
+                        var cobertura = coberturaDAL.Buscar(idc);
+                        if (cobertura.result != null)
+                            s.Cobertura = cobertura.result;
+                    }
+
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    if (idp > 0)
+                    {
+                        var paciente = pacienteDAL.Buscar(idp);
+                        if (paciente.result != null)
+                            s.Paciente = paciente.result;
+                    }
+
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+                    if (ide > 0)
+                    {
+                        var estado = turnoEstadoDAL.Buscar(ide);
+                        if (estado.result != null)
+                            s.Estado = estado.result;
+                    }
+
+                    res.Add(s);
                 }
-                return res;
+
+                return (res, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (res, "Error al Cargar Data, Metodo TurnoDAL.BuscarDni \n" + ex.Message.ToString());
             }
         }
 
-        public  List<TurnoDTO> BuscarDni(EmpleadoDTO med, string dni, DateTime desde, DateTime hasta)
+        public (List<TurnoDTO> result, string message) BuscarDni(EmpleadoDTO med, string dni, DateTime desde, DateTime hasta)
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            List<TurnoDTO> res = new List<TurnoDTO>();
+            try
             {
-                List<TurnoDTO> res = new List<TurnoDTO>();
-                var query = db.Turno
-                    .Where(el => (el.Medico.EmpleadoId == med.Id &&
-                        el.Paciente.Persona.Dni.Contains(dni)) &&
-                        DateTime.Compare(el.FechaHora, desde) >= 0 &&
-                        DateTime.Compare(el.FechaHora, hasta) <= 0)
-                    .OrderBy(el => el.FechaHora);
-                foreach (Turno temp in query)
+                var classKeys = Data.GetObjectKeys(new Turno());
+                var join = Data.JoinExpression("INNER", new List<string>() { "Turno", "Empleado", "Persona" }, new List<string>() { "Medico", "Persona", "Paciente" }, new List<string>() { "MedicoId", "PersonaId", "PersonaId" });
+                var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE Medico.EmpleadoId = '" + med.Id + "' AND Medico.Empleado.Persona.Dni LIKE '%" + dni + "%'"
+                    + "OR Paciente.Persona.Dni LIKE '%" + dni + "%' AND FechaHora BETWEEN '" + desde + "' AND '" + hasta + "'", OrderBy: "FechaHora");
+                var (dtPC, message) = Data.GetList(sql, "TurnoDAL.BuscarDni");
+                if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
+                    return (res, message);
+
+                foreach (DataRow temp in dtPC.Rows)
                 {
-                    res.Add(new TurnoDTO(
-                        temp.Id,
-                        new MedicoDTO(
-                            temp.Medico.Id,
-                            new EmpleadoDTO(
-                                temp.Medico.Empleado.EmpleadoId,
-                                new PersonaDTO(
-                                    temp.Medico.Empleado.Persona.PersonaId,
-                                    temp.Medico.Empleado.Persona.Dni,
-                                    temp.Medico.Empleado.Persona.Apellidos,
-                                    temp.Medico.Empleado.Persona.Nombres,
-                                    temp.Medico.Empleado.Persona.FechaNacimiento,
-                                    temp.Medico.Empleado.Persona.Sexo,
-                                    temp.Medico.Empleado.Persona.CorreoElectronico,
-                                    temp.Medico.Empleado.Persona.Telefono),
-                                temp.Medico.Empleado.Cuil,
-                                temp.Medico.Empleado.Usuario,
-                                temp.Medico.Empleado.Contraseña,
-                                temp.Medico.Empleado.FechaIngreso,
-                                new TipoUsuarioDTO(
-                                    temp.Medico.Empleado.TipoUsuario.Id,
-                                    temp.Medico.Empleado.TipoUsuario.Descripcion),
-                                temp.Medico.Empleado.Activo),
-                            temp.Medico.Matricula,
-                            new EspecialidadDTO(
-                                temp.Medico.Especialidad.Id,
-                                temp.Medico.Especialidad.Descripcion)),
-                        new PacienteDTO(
-                            temp.Paciente.Id,
-                            new PersonaDTO(
-                                temp.Paciente.Persona.PersonaId,
-                                temp.Paciente.Persona.Dni,
-                                temp.Paciente.Persona.Apellidos,
-                                temp.Paciente.Persona.Nombres,
-                                temp.Paciente.Persona.FechaNacimiento,
-                                temp.Paciente.Persona.Sexo,
-                                temp.Paciente.Persona.CorreoElectronico,
-                                temp.Paciente.Persona.Telefono)),
-                        temp.FechaHora,
-                        new CoberturaDTO(
-                            temp.Cobertura.Id,
-                            new ObraSocialDTO(
-                                temp.Cobertura.ObraSocial.ObraSocialId,
-                                temp.Cobertura.ObraSocial.Nombre,
-                                temp.Cobertura.ObraSocial.Estado),
-                            temp.Cobertura.Descripcion,
-                            temp.Cobertura.Estado),
-                        new TurnoEstadoDTO(
-                            temp.TurnoEstado.Id,
-                            temp.TurnoEstado.Descripcion)));
+                    var s = new TurnoDTO();
+                    s.Id = temp["TurnoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["TurnoId"]);
+                    s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
+
+                    var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    if (idm > 0)
+                    {
+                        var medico = medicoDAL.Buscar(idm);
+                        if (medico.result != null)
+                            s.Medico = medico.result;
+                    }
+
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    if (idc > 0)
+                    {
+                        var cobertura = coberturaDAL.Buscar(idc);
+                        if (cobertura.result != null)
+                            s.Cobertura = cobertura.result;
+                    }
+
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    if (idp > 0)
+                    {
+                        var paciente = pacienteDAL.Buscar(idp);
+                        if (paciente.result != null)
+                            s.Paciente = paciente.result;
+                    }
+
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+                    if (ide > 0)
+                    {
+                        var estado = turnoEstadoDAL.Buscar(ide);
+                        if (estado.result != null)
+                            s.Estado = estado.result;
+                    }
+
+                    res.Add(s);
                 }
-                return res;
+
+                return (res, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (res, "Error al Cargar Data, Metodo TurnoDAL.BuscarDni \n" + ex.Message.ToString());
             }
         }
 
-        public  bool Guardar(TurnoDTO turno)
+        public (bool result, string message) Guardar(TurnoDTO input)
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            try
             {
-                Turno nuevo = new Turno();
-                nuevo.MedicoId = turno.Medico.Id;
-                nuevo.PacienteId = turno.Paciente.Id;
-                nuevo.FechaHora = turno.FechaHora;
-                nuevo.CoberturaId = turno.Cobertura.Id;
-                nuevo.EstadoId = turno.Estado.Id;
-                try
-                {
-                    db.Turno.Add(nuevo);
-                    db.SaveChanges();
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
+                if (input == null || input.Id == 0)
+                    return (false, "Error Input Invalido, Metodo TurnoDAL.Guardar");
+
+                var parameters = new List<string> { "'" + input.Paciente.Id + "'", "'" + input.Cobertura.Id + "'", "'" + input.Estado.Id + "'", "'" + input.FechaHora.ToShortDateString() + "'" };
+                var classKeys = Data.GetObjectKeys(new Turno()).Where(x => x != "TurnoId").ToList();
+                var sql = Data.InsertExpression("Turno", classKeys, parameters);
+                var (response, message) = Data.CrudAction(sql, "TurnoDAL.Guardar");
+                if (!response)
+                    return (response, message);
+
+                return (response, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (false, "Error al Cargar Data, Metodo TurnoDAL.Guardar \n" + ex.Message.ToString());
             }
         }
 
-        public  bool Editar(TurnoDTO turno)
+        public (bool result, string message) Editar(TurnoDTO input)
         {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+            try
             {
-                Turno modificado = db.Turno
-                    .Where(el => el.Id == turno.Id)
-                    .First();
-                modificado.MedicoId = turno.Medico.Id;
-                modificado.PacienteId = turno.Paciente.Id;
-                modificado.FechaHora = turno.FechaHora;
-                modificado.CoberturaId = turno.Cobertura.Id;
-                modificado.EstadoId = turno.Estado.Id;
-                try
-                {
-                    db.Entry(modificado).State = EntityState.Modified;
-                    db.SaveChanges();
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
+                if (input == null || input.Id == 0)
+                    return (false, "Error Input Invalido, Metodo TurnoDAL.Editar");
+
+                var parameters = new List<string> { "'" + input.Paciente.Id + "'", "'" + input.Cobertura.Id + "'", "'" + input.Estado.Id + "'", "'" + input.FechaHora.ToShortDateString() + "'" };
+                var classKeys = Data.GetObjectKeys(new Turno()).Where(x => x != "TurnoId").ToList();
+                var sql = Data.UpdateExpression("Turno", classKeys, parameters, " WHERE TurnoId = '" + input.Id + "'");
+                var (response, message) = Data.CrudAction(sql, "TurnoDAL.Editar");
+                if (!response)
+                    return (response, message);
+
+                return (response, "Proceso Completado");
+            }
+            catch (Exception ex)
+            {
+                return (false, "Error al Cargar Data, Metodo TurnoDAL.Editar \n" + ex.Message.ToString());
             }
         }
     }

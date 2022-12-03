@@ -45,7 +45,7 @@ namespace AppointmentSystemMedical.CapaDatos
 
         public (CoberturaDTO result, string message) Buscar(int id)
         {
-            var s = new CoberturaDTO(0, new ObraSocialDTO(string.Empty, false), string.Empty, false);
+            var s = new CoberturaDTO();
             try
             {
                 if (id <= 0)
