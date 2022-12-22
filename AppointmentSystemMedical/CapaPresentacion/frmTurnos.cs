@@ -7,7 +7,7 @@ namespace AppointmentSystemMedical.CapaPresentacion
     public partial class frmTurnos : Form
     {
         private frmPrincipal Padre;
-
+        CapaLogica.Turno turno = new CapaLogica.Turno();
         public frmTurnos(frmPrincipal padre)
         {
             InitializeComponent();
@@ -16,7 +16,7 @@ namespace AppointmentSystemMedical.CapaPresentacion
 
         private void frmTurnos_Load(object sender, EventArgs e)
         {
-            Turno.CargarDataGrid(grdTurnos, Padre.Sesion);
+            turno.CargarDataGrid(grdTurnos, Padre.Sesion);
             AdministrarPermisos();
         }
 
@@ -120,15 +120,15 @@ namespace AppointmentSystemMedical.CapaPresentacion
             int dni;
             if (txtBuscar.Text == "" || txtBuscar.Text == "Buscar...")
             {
-                Turno.CargarDataGrid(grdTurnos, Padre.Sesion);
+                turno.CargarDataGrid(grdTurnos, Padre.Sesion);
             }
-            else if (Int32.TryParse(txtBuscar.Text, out dni))
+            else if (int.TryParse(txtBuscar.Text, out dni))
             {
-                Turno.CargarDataGrid(grdTurnos, Padre.Sesion, dni);
+                turno.CargarDataGrid(grdTurnos, Padre.Sesion, dni);
             }
             else
             {
-                Turno.CargarDataGrid(grdTurnos, Padre.Sesion, txtBuscar.Text);
+                turno.CargarDataGrid(grdTurnos, Padre.Sesion, txtBuscar.Text);
             }
         }
 
@@ -137,15 +137,15 @@ namespace AppointmentSystemMedical.CapaPresentacion
             int dni;
             if (txtBuscar.Text == "" || txtBuscar.Text == "Buscar...")
             {
-                Turno.CargarDataGrid(grdTurnos, Padre.Sesion, dtpDesde.Value, dtpHasta.Value);
+                turno.CargarDataGrid(grdTurnos, Padre.Sesion, dtpDesde.Value, dtpHasta.Value);
             }
-            else if (Int32.TryParse(txtBuscar.Text, out dni))
+            else if (int.TryParse(txtBuscar.Text, out dni))
             {
-                Turno.CargarDataGrid(grdTurnos, Padre.Sesion, dni, dtpDesde.Value, dtpHasta.Value);
+                turno.CargarDataGrid(grdTurnos, Padre.Sesion, dni, dtpDesde.Value, dtpHasta.Value);
             }
             else
             {
-                Turno.CargarDataGrid(grdTurnos, Padre.Sesion, txtBuscar.Text, dtpDesde.Value, dtpHasta.Value);
+                turno.CargarDataGrid(grdTurnos, Padre.Sesion, txtBuscar.Text, dtpDesde.Value, dtpHasta.Value);
             }
         }
     }

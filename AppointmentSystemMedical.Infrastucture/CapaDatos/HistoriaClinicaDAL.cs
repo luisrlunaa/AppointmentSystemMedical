@@ -21,7 +21,7 @@ namespace AppointmentSystemMedical.CapaDatos
                 if (id <= 0)
                     return (s, "Error Input Invalido, Metodo EspecialidadDAL.BuscarById");
 
-                var classKeys = Data.GetObjectKeys(new HistoriaClinica());
+                var classKeys = Data.GetObjectKeys(new HistoriaClinica()).Where(x => x != "Turno").ToList();
                 var sql = Data.SelectExpression("HistoriaClinica", classKeys, WhereExpresion: " WHERE HistoriaClinicaId ='" + id + "'");
                 var (dr, message1) = Data.GetOne(sql, "HistoriaClinicaDAL.BuscarById");
                 if (dr is null)
@@ -56,7 +56,7 @@ namespace AppointmentSystemMedical.CapaDatos
                     return (s, "Error Input Invalido, Metodo EspecialidadDAL.BuscarByTurnoId");
 
                 var join = Data.JoinExpression("INNER", new List<string>() { "HistoriaClinica" }, new List<string>() { "Turno" }, new List<string>() { "TurnoId" });
-                var classKeys = Data.GetObjectKeys(new HistoriaClinica());
+                var classKeys = Data.GetObjectKeys(new HistoriaClinica()).Where(x => x != "Turno").ToList(); 
                 var sql = Data.SelectExpression("HistoriaClinica", classKeys, WhereExpresion: " WHERE Turno.TurnoId ='" + tur.Id + "'");
                 var (dr, message1) = Data.GetOne(sql, "HistoriaClinicaDAL.BuscarByTurnoId");
                 if (dr is null)
@@ -125,7 +125,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<HistoriaClinicaDTO> res = new List<HistoriaClinicaDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new HistoriaClinica());
+                var classKeys = Data.GetObjectKeys(new HistoriaClinica()).Where(x => x != "Turno").ToList();
                 var join = Data.JoinExpression("INNER", new List<string>() { "HistoriaClinica", "Turno" }, new List<string>() { "Turno", "Medico" }, new List<string>() { "TurnoId" });
                 var sql = Data.SelectExpression("HistoriaClinica", classKeys, WhereExpresion: " WHERE Turno.PacienteId = '" + pac.Id + "' AND Medico.EmpleadoId= '" + emp.Id + "'", OrderBy: "FechaHora");
                 var (dtPC, message) = Data.GetList(sql, "HistoriaClinicaDAL.BuscarByEmpleadoId");
@@ -166,7 +166,7 @@ namespace AppointmentSystemMedical.CapaDatos
                     return (false, "Error Input Invalido, Metodo HistoriaClinicaDAL.Guardar");
 
                 var parameters = new List<string> { "'" + input.Id + "'", "'" + input.Descripcion + "'", "'" + input.Archivo + "'" };
-                var classKeys = Data.GetObjectKeys(new HistoriaClinica()).Where(x => x != "HistoriaClinicaId").ToList();
+                var classKeys = Data.GetObjectKeys(new HistoriaClinica()).Where(x => x != "HistoriaClinicaId" && x != "Turno").ToList();
                 var sql = Data.InsertExpression("HistoriaClinica", classKeys, parameters);
                 var (response, message) = Data.CrudAction(sql, "HistoriaClinicaDAL.Guardar");
                 if (!response)
@@ -188,7 +188,7 @@ namespace AppointmentSystemMedical.CapaDatos
                     return (false, "Error Input Invalido, Metodo HistoriaClinicaDAL.Editar");
 
                 var parameters = new List<string> { "'" + input.Id + "'", "'" + input.Descripcion + "'", "'" + input.Archivo + "'" };
-                var classKeys = Data.GetObjectKeys(new HistoriaClinica()).Where(x => x != "HistoriaClinicaId").ToList();
+                var classKeys = Data.GetObjectKeys(new HistoriaClinica()).Where(x => x != "HistoriaClinicaId" && x != "Turno").ToList(); 
                 var sql = Data.UpdateExpression("HistoriaClinica", classKeys, parameters, " WHERE HistoriaClinicaId = '" + input.Id + "'");
                 var (response, message) = Data.CrudAction(sql, "HistoriaClinicaDAL.Editar");
                 if (!response)

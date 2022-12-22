@@ -7,7 +7,7 @@ namespace AppointmentSystemMedical.CapaPresentacion.Secretario
     public partial class frmCoberturas : Form
     {
         private frmPrincipal Padre;
-
+        CapaLogica.Cobertura cobertura = new CapaLogica.Cobertura();
         public frmCoberturas(frmPrincipal padre)
         {
             InitializeComponent();
@@ -17,7 +17,7 @@ namespace AppointmentSystemMedical.CapaPresentacion.Secretario
         private void frmCoberturas_Load(object sender, EventArgs e)
         {
             AdministrarPermisos();
-            CapaLogica.Cobertura.CargarDataGrid(grdCoberturas);
+            cobertura.CargarDataGrid(grdCoberturas);
         }
 
         private void txtBuscar_Enter(object sender, EventArgs e)
@@ -94,11 +94,11 @@ namespace AppointmentSystemMedical.CapaPresentacion.Secretario
 
             if (txtBuscar.Text == "")
             {
-                CapaLogica.Cobertura.CargarDataGrid(grdCoberturas);
+                cobertura.CargarDataGrid(grdCoberturas);
             }
             else
             {
-                CapaLogica.Cobertura.CargarDataGrid(grdCoberturas, txtBuscar.Text);
+                cobertura.CargarDataGrid(grdCoberturas, txtBuscar.Text);
             }
         }
     }

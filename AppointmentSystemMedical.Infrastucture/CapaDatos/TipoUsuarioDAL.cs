@@ -4,6 +4,7 @@ using AppointmentSystemMedical.Model.Entities;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 
 namespace AppointmentSystemMedical.CapaDatos
 {
@@ -15,7 +16,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<TipoUsuarioDTO> res = new List<TipoUsuarioDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new TipoUsuario());
+                var classKeys = Data.GetObjectKeys(new TipoUsuario()).Where(x => x != "Empleado").ToList();
                 var sql = Data.SelectExpression("TipoUsuario", classKeys);
                 var (dtPC, message) = Data.GetList(sql, "TipoUsuarioDAL.Buscar");
                 if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
@@ -44,12 +45,11 @@ namespace AppointmentSystemMedical.CapaDatos
                 if (id <= 0)
                     return (s, "Error Input Invalido, Metodo TipoUsuarioDAL.BuscarById");
 
-                var classKeys = Data.GetObjectKeys(new TipoUsuario());
+                var classKeys = Data.GetObjectKeys(new TipoUsuario()).Where(x => x != "Empleado").ToList();
                 var sql = Data.SelectExpression("TipoUsuario", classKeys, WhereExpresion: " WHERE TipoUsuarioId ='" + id + "'");
                 var (dr, message1) = Data.GetOne(sql, "TipoUsuarioDAL.BuscarById");
                 if (dr is null)
                     return (s, message1);
-
 
                 s.Id = dr["Id"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("Id")) : 0;
                 s.Descripcion = dr["Descripcion"].GetType() != typeof(DBNull) ? dr.GetString(dr.GetOrdinal("Descripcion")) : string.Empty;

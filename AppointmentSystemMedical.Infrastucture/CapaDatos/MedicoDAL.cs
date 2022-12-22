@@ -19,7 +19,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<MedicoDTO> res = new List<MedicoDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new Medico());
+                var classKeys = Data.GetObjectKeys(new Medico()).Where(x => x != "Empleado" && x != "Especialidad" && x != "Turno").ToList();
                 var sql = Data.SelectExpression("Medico", classKeys);
                 var (dtPC, message) = Data.GetList(sql, "MedicoDAL.Buscar");
                 if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
@@ -29,6 +29,11 @@ namespace AppointmentSystemMedical.CapaDatos
                 {
                     var s = new MedicoDTO();
                     var idEmpleado = temp["EmpleadoId"] != DBNull.Value ? Convert.ToInt32(temp["EmpleadoId"]) : 0;
+                    var idEspecialidad = temp["EspecialidadId"] != DBNull.Value ? Convert.ToInt32(temp["EspecialidadId"]) : 0;
+
+                    s.Id = temp["MedicoId"] != DBNull.Value ? Convert.ToInt32(temp["MedicoId"]) : 0;
+                    s.Matricula = temp["Matricula"] != DBNull.Value ? Convert.ToString(temp["Matricula"]) : string.Empty; 
+                    
                     if (idEmpleado > 0)
                     {
                         var empleado = empleadoDAL.Buscar(idEmpleado);
@@ -36,16 +41,12 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Empleado = empleado.result;
                     }
 
-                    var idEspecialidad = temp["EspecialidadId"] != DBNull.Value ? Convert.ToInt32(temp["EspecialidadId"]) : 0;
                     if (idEspecialidad > 0)
                     {
                         var especialidad = especialidadDAL.Buscar(idEspecialidad);
                         if (especialidad.result != null)
                             s.Especialidad = especialidad.result;
                     }
-
-                    s.Id = temp["MedicoId"] != DBNull.Value ? Convert.ToInt32(temp["MedicoId"]) : 0;
-                    s.Matricula = temp["Matricula"] != DBNull.Value ? Convert.ToString(temp["Matricula"]) : string.Empty;
 
                     res.Add(s);
                 }
@@ -66,13 +67,17 @@ namespace AppointmentSystemMedical.CapaDatos
                 if (id == 0)
                     return (s, "Error Input Invalido, Metodo MedicoDAL.BuscarById");
 
-                var classKeys = Data.GetObjectKeys(new Medico());
+                var classKeys = Data.GetObjectKeys(new Medico()).Where(x => x != "Empleado" && x != "Especialidad" && x != "Turno").ToList();
                 var sql = Data.SelectExpression("Medico", classKeys, WhereExpresion: " WHERE MedicoId ='" + id + "'");
                 var (dr, message1) = Data.GetOne(sql, "MedicoDAL.BuscarById");
                 if (dr is null)
                     return (s, message1);
 
                 var idEmpleado = dr["EmpleadoId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("EmpleadoId")) : 0;
+                var idEspecialidad = dr["EspecialidadId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("EspecialidadId")) : 0;
+
+                s.Id = dr["MedicoId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("MedicoId")) : 0;
+                s.Matricula = dr["Matricula"].GetType() != typeof(DBNull) ? dr.GetString(dr.GetOrdinal("Matricula")) : string.Empty;
                 if (idEmpleado > 0)
                 {
                     var empleado = empleadoDAL.Buscar(idEmpleado);
@@ -80,16 +85,12 @@ namespace AppointmentSystemMedical.CapaDatos
                         s.Empleado = empleado.result;
                 }
 
-                var idEspecialidad = dr["EspecialidadId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("EspecialidadId")) : 0;
                 if (idEspecialidad > 0)
                 {
                     var especialidad = especialidadDAL.Buscar(idEspecialidad);
                     if (especialidad.result != null)
                         s.Especialidad = especialidad.result;
                 }
-
-                s.Id = dr["MedicoId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("MedicoId")) : 0;
-                s.Matricula = dr["Matricula"].GetType() != typeof(DBNull) ? dr.GetString(dr.GetOrdinal("Matricula")) : string.Empty;
 
                 return (s, "Proceso Completado");
             }
@@ -104,7 +105,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<MedicoDTO> res = new List<MedicoDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new Medico());
+                var classKeys = Data.GetObjectKeys(new Medico()).Where(x => x != "Empleado" && x != "Especialidad" && x != "Turno").ToList();
                 var join = Data.JoinExpression("INNER", new List<string>() { "Medico", "Empleado" }, new List<string>() { "Empleado", "Persona" }, new List<string>() { "MedicoId", "PersonaId" });
                 var sql = Data.SelectExpression("Medico", classKeys, JoinExp: join, WhereExpresion: "Where Persona.Dni LIKE '%" + dni + "%'");
                 var (dtPC, message) = Data.GetList(sql, "MedicoDAL.BuscarApeNom");
@@ -115,6 +116,10 @@ namespace AppointmentSystemMedical.CapaDatos
                 {
                     var s = new MedicoDTO();
                     var idEmpleado = temp["EmpleadoId"] != DBNull.Value ? Convert.ToInt32(temp["EmpleadoId"]) : 0;
+                    var idEspecialidad = temp["EspecialidadId"] != DBNull.Value ? Convert.ToInt32(temp["EspecialidadId"]) : 0;
+
+                    s.Id = temp["MedicoId"] != DBNull.Value ? Convert.ToInt32(temp["MedicoId"]) : 0;
+                    s.Matricula = temp["Matricula"] != DBNull.Value ? Convert.ToString(temp["Matricula"]) : string.Empty;
                     if (idEmpleado > 0)
                     {
                         var empleado = empleadoDAL.Buscar(idEmpleado);
@@ -122,16 +127,12 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Empleado = empleado.result;
                     }
 
-                    var idEspecialidad = temp["EspecialidadId"] != DBNull.Value ? Convert.ToInt32(temp["EspecialidadId"]) : 0;
                     if (idEspecialidad > 0)
                     {
                         var especialidad = especialidadDAL.Buscar(idEspecialidad);
                         if (especialidad.result != null)
                             s.Especialidad = especialidad.result;
                     }
-
-                    s.Id = temp["MedicoId"] != DBNull.Value ? Convert.ToInt32(temp["MedicoId"]) : 0;
-                    s.Matricula = temp["Matricula"] != DBNull.Value ? Convert.ToString(temp["Matricula"]) : string.Empty;
 
                     res.Add(s);
                 }
@@ -149,7 +150,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<MedicoDTO> res = new List<MedicoDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new Medico());
+                var classKeys = Data.GetObjectKeys(new Medico()).Where(x => x != "Empleado" && x != "Especialidad" && x != "Turno").ToList();
                 var join = Data.JoinExpression("INNER", new List<string>() { "Medico", "Empleado" }, new List<string>() { "Empleado", "Persona" }, new List<string>() { "MedicoId", "PersonaId" });
                 var sql = Data.SelectExpression("Medico", classKeys, JoinExp: join, WhereExpresion: "Where Persona.Apellidos LIKE '%" + apenom + "%' OR Persona.Nombres LIKE '%" + apenom + "%'");
                 var (dtPC, message) = Data.GetList(sql, "MedicoDAL.BuscarApeNom");
@@ -160,6 +161,10 @@ namespace AppointmentSystemMedical.CapaDatos
                 {
                     var s = new MedicoDTO();
                     var idEmpleado = temp["EmpleadoId"] != DBNull.Value ? Convert.ToInt32(temp["EmpleadoId"]) : 0;
+                    var idEspecialidad = temp["EspecialidadId"] != DBNull.Value ? Convert.ToInt32(temp["EspecialidadId"]) : 0;
+
+                    s.Id = temp["MedicoId"] != DBNull.Value ? Convert.ToInt32(temp["MedicoId"]) : 0;
+                    s.Matricula = temp["Matricula"] != DBNull.Value ? Convert.ToString(temp["Matricula"]) : string.Empty;
                     if (idEmpleado > 0)
                     {
                         var empleado = empleadoDAL.Buscar(idEmpleado);
@@ -167,16 +172,12 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Empleado = empleado.result;
                     }
 
-                    var idEspecialidad = temp["EspecialidadId"] != DBNull.Value ? Convert.ToInt32(temp["EspecialidadId"]) : 0;
                     if (idEspecialidad > 0)
                     {
                         var especialidad = especialidadDAL.Buscar(idEspecialidad);
                         if (especialidad.result != null)
                             s.Especialidad = especialidad.result;
                     }
-
-                    s.Id = temp["MedicoId"] != DBNull.Value ? Convert.ToInt32(temp["MedicoId"]) : 0;
-                    s.Matricula = temp["Matricula"] != DBNull.Value ? Convert.ToString(temp["Matricula"]) : string.Empty;
 
                     res.Add(s);
                 }
@@ -198,7 +199,7 @@ namespace AppointmentSystemMedical.CapaDatos
 
                 var parameters = new List<string> { "'" + input.Matricula + "'",
                     "'" + input.Especialidad.Id + "'", "'" + input.Empleado.Id + "'" };
-                var classKeys = Data.GetObjectKeys(new Medico()).Where(x => x != "MedicoId").ToList();
+                var classKeys = Data.GetObjectKeys(new Medico()).Where(x => x != "MedicoId" && x != "Empleado" && x != "Especialidad" && x != "Turno").ToList();
                 var sql = Data.InsertExpression("Medico", classKeys, parameters);
                 var (response, message) = Data.CrudAction(sql, "MedicoDAL.Guardar");
                 if (!response)
@@ -221,7 +222,7 @@ namespace AppointmentSystemMedical.CapaDatos
 
                 var parameters = new List<string> { "'" + input.Matricula + "'",
                     "'" + input.Especialidad.Id + "'", "'" + input.Empleado.Id + "'" };
-                var classKeys = Data.GetObjectKeys(new Medico()).Where(x => x != "MedicoId").ToList();
+                var classKeys = Data.GetObjectKeys(new Medico()).Where(x => x != "MedicoId" && x != "Empleado" && x != "Especialidad" && x != "Turno").ToList();
                 var sql = Data.UpdateExpression("Medico", classKeys, parameters, " WHERE MedicoId = '" + input.Id + "'");
                 var (response, message) = Data.CrudAction(sql, "MedicoDAL.Editar");
                 if (!response)

@@ -1,4 +1,5 @@
 ﻿using AppointmentSystemMedical.CapaDatos;
+using AppointmentSystemMedical.Model.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,22 +9,45 @@ namespace AppointmentSystemMedical.CapaLogica
 {
     public class Turno
     {
-        public static TurnoDTO Buscar(int id)
+        TurnoDAL turnoDAL = new TurnoDAL();
+        CoberturaDAL coberturaDAL = new CoberturaDAL();
+        TurnoEstadoDAL turnoEstadoDAL = new TurnoEstadoDAL();
+        public TurnoDTO Buscar(int id)
         {
-            return TurnoDAL.Buscar(id);
+            var (result, message) = turnoDAL.Buscar(id);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            return result;
         }
 
-        public static void CargarDataGrid(DataGridView grd, EmpleadoDTO emp)
+        public void CargarDataGrid(DataGridView grd, EmpleadoDTO emp)
         {
             grd.Rows.Clear();
             List<TurnoDTO> turnos = new List<TurnoDTO>();
             if (emp.TipoUsuario.Id == 3)
             {
-                turnos = TurnoDAL.Buscar(emp);
+                var (result, message) = turnoDAL.Buscar(emp);
+                if (message.Contains("Error"))
+                    MessageBox.Show(message,
+                                    "Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+                turnos = result;
             }
             else
             {
-                turnos = TurnoDAL.Buscar();
+                var (result, message) = turnoDAL.Buscar();
+                if (message.Contains("Error"))
+                    MessageBox.Show(message,
+                                    "Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+
+                turnos = result;
             }
             foreach (TurnoDTO turno in turnos)
             {
@@ -43,17 +67,31 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void CargarDataGrid(DataGridView grd, EmpleadoDTO emp, string apenom)
+        public void CargarDataGrid(DataGridView grd, EmpleadoDTO emp, string apenom)
         {
             grd.Rows.Clear();
             List<TurnoDTO> turnos = new List<TurnoDTO>();
             if (emp.TipoUsuario.Id == 3)
             {
-                turnos = TurnoDAL.BuscarApeNom(emp, apenom);
+                var (result, message) = turnoDAL.BuscarApeNom(emp, apenom);
+                if (message.Contains("Error"))
+                    MessageBox.Show(message,
+                                    "Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+
+                turnos = result;
             }
             else
             {
-                turnos = TurnoDAL.BuscarApeNom(apenom);
+                var (result, message) = turnoDAL.BuscarApeNom(apenom);
+                if (message.Contains("Error"))
+                    MessageBox.Show(message,
+                                    "Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+
+                turnos = result;
             }
 
             foreach (TurnoDTO turno in turnos)
@@ -73,17 +111,31 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void CargarDataGrid(DataGridView grd, EmpleadoDTO emp, int dni)
+        public void CargarDataGrid(DataGridView grd, EmpleadoDTO emp, int dni)
         {
             grd.Rows.Clear();
             List<TurnoDTO> turnos = new List<TurnoDTO>();
             if (emp.TipoUsuario.Id == 3)
             {
-                turnos = TurnoDAL.BuscarDni(emp, dni.ToString());
+                var (result, message) = turnoDAL.BuscarDni(emp, dni.ToString());
+                if (message.Contains("Error"))
+                    MessageBox.Show(message,
+                                    "Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+
+                turnos = result;
             }
             else
             {
-                turnos = TurnoDAL.BuscarDni(dni.ToString());
+                var (result, message) = turnoDAL.BuscarDni(dni.ToString());
+                if (message.Contains("Error"))
+                    MessageBox.Show(message,
+                                    "Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+
+                turnos = result;
             }
 
             foreach (TurnoDTO turno in turnos)
@@ -103,18 +155,31 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void CargarDataGrid(DataGridView grd, EmpleadoDTO emp, DateTime desde, DateTime hasta)
+        public void CargarDataGrid(DataGridView grd, EmpleadoDTO emp, DateTime desde, DateTime hasta)
         {
             grd.Rows.Clear();
             List<TurnoDTO> turnos = new List<TurnoDTO>();
             if (emp.TipoUsuario.Id == 3)
             {
-                turnos = TurnoDAL.Buscar(emp, desde, hasta);
+                var (result, message) = turnoDAL.Buscar(emp, desde, hasta);
+                if (message.Contains("Error"))
+                    MessageBox.Show(message,
+                                    "Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+
+                turnos = result;
             }
             else
             {
-                turnos = TurnoDAL.Buscar(desde, hasta);
-                Console.WriteLine();
+                var (result, message) = turnoDAL.Buscar(desde, hasta);
+                if (message.Contains("Error"))
+                    MessageBox.Show(message,
+                                    "Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+
+                turnos = result;
             }
             foreach (TurnoDTO turno in turnos)
             {
@@ -131,17 +196,31 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void CargarDataGrid(DataGridView grd, EmpleadoDTO emp, string apenom, DateTime desde, DateTime hasta)
+        public void CargarDataGrid(DataGridView grd, EmpleadoDTO emp, string apenom, DateTime desde, DateTime hasta)
         {
             grd.Rows.Clear();
             List<TurnoDTO> turnos = new List<TurnoDTO>();
             if (emp.TipoUsuario.Id == 3)
             {
-                turnos = TurnoDAL.BuscarApeNom(emp, apenom, desde, hasta);
+                var (result, message) = turnoDAL.BuscarApeNom(emp, apenom, desde, hasta);
+                if (message.Contains("Error"))
+                    MessageBox.Show(message,
+                                    "Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+
+                turnos = result;
             }
             else
             {
-                turnos = TurnoDAL.BuscarApeNom(apenom, desde, hasta);
+                var (result, message) = turnoDAL.BuscarApeNom(apenom, desde, hasta);
+                if (message.Contains("Error"))
+                    MessageBox.Show(message,
+                                    "Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+
+                turnos = result;
             }
 
             foreach (TurnoDTO turno in turnos)
@@ -158,17 +237,31 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void CargarDataGrid(DataGridView grd, EmpleadoDTO emp, int dni, DateTime desde, DateTime hasta)
+        public void CargarDataGrid(DataGridView grd, EmpleadoDTO emp, int dni, DateTime desde, DateTime hasta)
         {
             grd.Rows.Clear();
             List<TurnoDTO> turnos = new List<TurnoDTO>();
             if (emp.TipoUsuario.Id == 3)
             {
-                turnos = TurnoDAL.BuscarDni(emp, dni.ToString(), desde, hasta);
+                var (result, message) = turnoDAL.BuscarDni(emp, dni.ToString(), desde, hasta);
+                if (message.Contains("Error"))
+                    MessageBox.Show(message,
+                                    "Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+
+                turnos = result;
             }
             else
             {
-                turnos = TurnoDAL.BuscarDni(dni.ToString(), desde, hasta);
+                var (result, message) = turnoDAL.BuscarDni(dni.ToString(), desde, hasta);
+                if (message.Contains("Error"))
+                    MessageBox.Show(message,
+                                    "Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+
+                turnos = result;
             }
 
             foreach (TurnoDTO turno in turnos)
@@ -185,7 +278,7 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void CargarAgenda(DataGridView grd, MedicoDTO med, DateTime dia)
+        public void CargarAgenda(DataGridView grd, MedicoDTO med, DateTime dia)
         {
             grd.Rows.Clear();
             // agrego los horarios
@@ -200,7 +293,14 @@ namespace AppointmentSystemMedical.CapaLogica
             for (int y = 1; y < 6; y++)
             {
                 grd.Columns[y].HeaderText = DiaDeLaSemana(dia) + " " + PonerDosNumeros(dia.Day);
-                List<TurnoDTO> turnos = TurnoDAL.Buscar(med, dia);
+                var (result, message) = turnoDAL.Buscar(med, dia);
+                if (message.Contains("Error"))
+                    MessageBox.Show(message,
+                                    "Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+
+                var turnos = result;
                 for (int x = 0; x < 48; x++)
                 {
                     int hh = (x % 2 == 0) ? x / 2 : (x - 1) / 2;
@@ -222,17 +322,17 @@ namespace AppointmentSystemMedical.CapaLogica
             ColorearAgenda(grd);
         }
 
-        public static int HoraAPeriodo(DateTime t)
+        public int HoraAPeriodo(DateTime t)
         {
             return t.Hour * 2 + ((t.Minute == 30) ? 1 : 0);
         }
 
-        public static DateTime PerdiodoAHora(int p)
+        public DateTime PerdiodoAHora(int p)
         {
             return new DateTime(1995, 01, 07, (p % 2 == 0) ? p / 2 : (p - 1) / 2, (p % 2 == 0) ? 0 : 30, 0);
         }
 
-        private static string DiaDeLaSemana(DateTime d)
+        private string DiaDeLaSemana(DateTime d)
         {
             switch (d.DayOfWeek)
             {
@@ -255,7 +355,7 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        private static void ColorearAgenda(DataGridView grd)
+        private void ColorearAgenda(DataGridView grd)
         {
             for (int c = 1; c < grd.Columns.Count; c++)
             {
@@ -281,7 +381,7 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        private static string PonerDosNumeros(int n)
+        private string PonerDosNumeros(int n)
         {
             if (n < 10)
             {
@@ -291,10 +391,31 @@ namespace AppointmentSystemMedical.CapaLogica
             return n.ToString();
         }
 
-        public static void Guardar(MedicoDTO med, PacienteDTO pac, DateTime fh, int cob)
+        public void Guardar(MedicoDTO med, PacienteDTO pac, DateTime fh, int cob)
         {
-            TurnoDTO nuevo = new TurnoDTO(med, pac, fh, CoberturaDAL.Buscar(cob), TurnoEstadoDAL.Buscar(1));
-            if (TurnoDAL.Guardar(nuevo))
+            var (result1, message1) = turnoEstadoDAL.Buscar(1);
+            if (message1.Contains("Error"))
+                MessageBox.Show(message1,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            var (result2, message2) = coberturaDAL.Buscar(cob);
+            if (message2.Contains("Error"))
+                MessageBox.Show(message2,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            TurnoDTO nuevo = new TurnoDTO(med, pac, fh, result2, result1);
+            var (save, message) = turnoDAL.Guardar(nuevo);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            if (save)
             {
                 MessageBox.Show(
                     "El turno fue guardado correctamente.",
@@ -312,10 +433,31 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void Editar(int id, MedicoDTO med, PacienteDTO pac, DateTime fh, int cob, int est)
+        public void Editar(int id, MedicoDTO med, PacienteDTO pac, DateTime fh, int cob, int est)
         {
-            TurnoDTO nuevo = new TurnoDTO(id, med, pac, fh, CoberturaDAL.Buscar(cob), TurnoEstadoDAL.Buscar(est));
-            if (TurnoDAL.Editar(nuevo))
+            var (result1, message1) = turnoEstadoDAL.Buscar(est);
+            if (message1.Contains("Error"))
+                MessageBox.Show(message1,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            var (result2, message2) = coberturaDAL.Buscar(cob);
+            if (message2.Contains("Error"))
+                MessageBox.Show(message2,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            TurnoDTO nuevo = new TurnoDTO(id, med, pac, fh, result2, result1);
+            var (save, message) = turnoDAL.Editar(nuevo);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            if (save)
             {
                 MessageBox.Show(
                     "El turno fue modificado correctamente.",

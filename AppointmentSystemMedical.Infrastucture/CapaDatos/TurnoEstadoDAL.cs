@@ -4,6 +4,7 @@ using AppointmentSystemMedical.Model.Entities;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 
 namespace AppointmentSystemMedical.CapaDatos
 {
@@ -15,7 +16,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<TurnoEstadoDTO> res = new List<TurnoEstadoDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new TurnoEstado());
+                var classKeys = Data.GetObjectKeys(new TurnoEstado()).Where(x => x != "Turno").ToList();
                 var sql = Data.SelectExpression("TurnoEstado", classKeys);
                 var (dtPC, message) = Data.GetList(sql, "TurnoEstadoDAL.Buscar");
                 if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
@@ -44,12 +45,11 @@ namespace AppointmentSystemMedical.CapaDatos
                 if (id <= 0)
                     return (s, "Error Input Invalido, Metodo TurnoEstadoDAL.BuscarById");
 
-                var classKeys = Data.GetObjectKeys(new TurnoEstado());
+                var classKeys = Data.GetObjectKeys(new TurnoEstado()).Where(x => x != "Turno").ToList();
                 var sql = Data.SelectExpression("TurnoEstado", classKeys, WhereExpresion: " WHERE TurnoEstadoId ='" + id + "'");
                 var (dr, message1) = Data.GetOne(sql, "TurnoEstadoDAL.BuscarById");
                 if (dr is null)
                     return (s, message1);
-
 
                 s.Id = dr["TurnoEstadoId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("TurnoEstadoId")) : 0;
                 s.Descripcion = dr["Descripcion"].GetType() != typeof(DBNull) ? dr.GetString(dr.GetOrdinal("Descripcion")) : string.Empty;

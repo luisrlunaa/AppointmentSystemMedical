@@ -7,7 +7,7 @@ namespace AppointmentSystemMedical.CapaPresentacion
     public partial class frmAcceso : Form
     {
         private frmPrincipal Padre;
-
+        CapaLogica.Empleado empleado = new CapaLogica.Empleado();
         public frmAcceso(frmPrincipal padre)
         {
             InitializeComponent();
@@ -64,7 +64,7 @@ namespace AppointmentSystemMedical.CapaPresentacion
         {
             if (!ValidarCampos()) return;
 
-            EmpleadoDTO sesion = Empleado.Ingresar(txtUsuario.Text, txtContraseña.Text);
+            EmpleadoDTO sesion = empleado.Ingresar(txtUsuario.Text, txtContraseña.Text);
             if (sesion != null)
             {
                 Padre.Sesion = sesion;

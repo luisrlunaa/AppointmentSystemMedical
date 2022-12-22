@@ -10,7 +10,7 @@ namespace AppointmentSystemMedical.CapaPresentacion.Medico
         private frmPrincipal Padre;
         private TurnoDTO Tur;
         private HistoriaClinicaDTO HC;
-
+        CapaLogica.HistoriaClinica historiaClinica = new CapaLogica.HistoriaClinica();
         public frmNuevoHistoriaClinica(frmPrincipal padre, TurnoDTO tur)
         {
             InitializeComponent();
@@ -24,7 +24,7 @@ namespace AppointmentSystemMedical.CapaPresentacion.Medico
             InitializeComponent();
             Padre = padre;
             Tur = tur;
-            HC = CapaLogica.HistoriaClinica.BuscarTurno(tur);
+            HC = historiaClinica.BuscarTurno(tur);
         }
 
         private void frmNuevoHistoriaClinica_Load(object sender, EventArgs e)
@@ -52,11 +52,11 @@ namespace AppointmentSystemMedical.CapaPresentacion.Medico
                 {
                     if (HC == null)
                     {
-                        CapaLogica.HistoriaClinica.Guardar(Tur, txtDescripcion.Text, txtArchivo.Text);
+                        historiaClinica.Guardar(Tur, txtDescripcion.Text, txtArchivo.Text);
                     }
                     else
                     {
-                        CapaLogica.HistoriaClinica.Editar(HC.Id, Tur, txtDescripcion.Text, txtArchivo.Text);
+                        historiaClinica.Editar(HC.Id, Tur, txtDescripcion.Text, txtArchivo.Text);
                     }
                     Padre.AbrirFormPanel(new Medico.frmHistoriasClinicas(Padre, Tur.Paciente.Id));
                 }

@@ -15,19 +15,19 @@ namespace AppointmentSystemMedical.CapaPresentacion.Gerente
 
         private void frmEstadisticas_Load(object sender, System.EventArgs e)
         {
-            CargarReporte();
+            //CargarReporte();
         }
 
-        private void CargarReporte()
-        {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
-            {
-                ObtenerCartillaMedica_ResultBindingSource.DataSource = db.ObtenerCartillaMedica();
-                ObtenerFechaActual_ResultBindingSource.DataSource = db.ObtenerFechaActual();
-                this.rptViewer.RefreshReport();
-            }
-            rptViewer.SetDisplayMode(DisplayMode.PrintLayout);
-            rptViewer.ZoomMode = ZoomMode.PageWidth;
-        }
+        //private void CargarReporte()
+        //{
+        //    using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+        //    {
+        //        ObtenerCartillaMedica_ResultBindingSource.DataSource = db.ObtenerCartillaMedica();
+        //        ObtenerFechaActual_ResultBindingSource.DataSource = db.ObtenerFechaActual();
+        //        this.rptViewer.RefreshReport();
+        //    }
+        //    rptViewer.SetDisplayMode(DisplayMode.PrintLayout);
+        //    rptViewer.ZoomMode = ZoomMode.PageWidth;
+        //}
     }
 }

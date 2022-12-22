@@ -15,19 +15,19 @@ namespace AppointmentSystemMedical.CapaPresentacion.Secretario
 
         private void frmEstadisticas_Load(object sender, System.EventArgs e)
         {
-            CargarReporte();
+            //CargarReporte();
         }
 
-        private void CargarReporte()
-        {
-            using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
-            {
-                ObtenerFechaActual_ResultBindingSource.DataSource = db.ObtenerFechaActual();
-                ObtenerUltimoTurno_ResultBindingSource.DataSource = db.ObtenerUltimoTurno();
-                this.rptViewer.RefreshReport();
-            }
-            rptViewer.SetDisplayMode(DisplayMode.PrintLayout);
-            rptViewer.ZoomMode = ZoomMode.PageWidth;
-        }
+        //private void CargarReporte()
+        //{
+        //    using (AppointmentSystemMedicalEntities db = new AppointmentSystemMedicalEntities())
+        //    {
+        //        ObtenerFechaActual_ResultBindingSource.DataSource = db.ObtenerFechaActual();
+        //        ObtenerUltimoTurno_ResultBindingSource.DataSource = db.ObtenerUltimoTurno();
+        //        this.rptViewer.RefreshReport();
+        //    }
+        //    rptViewer.SetDisplayMode(DisplayMode.PrintLayout);
+        //    rptViewer.ZoomMode = ZoomMode.PageWidth;
+        //}
     }
 }

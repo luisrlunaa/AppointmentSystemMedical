@@ -1,4 +1,5 @@
 ﻿using AppointmentSystemMedical.CapaDatos;
+using AppointmentSystemMedical.Model.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
@@ -7,16 +8,31 @@ namespace AppointmentSystemMedical.CapaLogica
 {
     public class ObraSocial
     {
-        public static ObraSocialDTO Buscar(int id)
+        ObraSocialDAL obraSocialDAL = new ObraSocialDAL();
+        public ObraSocialDTO Buscar(int id)
         {
-            return ObraSocialDAL.Buscar(id);
+            var (result, message) = obraSocialDAL.Buscar(id);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            return result;
         }
 
-        public static void CargarComboBox(ComboBox cb)
+        public void CargarComboBox(ComboBox cb)
         {
             int ancho = 0;
             int maximo = 0;
-            foreach (ObraSocialDTO temp in ObraSocialDAL.Buscar())
+            var (result, message) = obraSocialDAL.Buscar();
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            foreach (ObraSocialDTO temp in result)
             {
                 // calculo en ancho mas largo de texto
                 ancho = TextRenderer.MeasureText(temp.Nombre, cb.Font).Width;
@@ -35,11 +51,17 @@ namespace AppointmentSystemMedical.CapaLogica
             cb.DropDownWidth = maximo;
         }
 
-        public static void CargarDataGrid(DataGridView grd)
+        public void CargarDataGrid(DataGridView grd)
         {
             grd.Rows.Clear();
-            List<ObraSocialDTO> os = new List<ObraSocialDTO>();
-            os = ObraSocialDAL.Buscar();
+            var (result, message) = obraSocialDAL.Buscar();
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            var os = result;
             foreach (ObraSocialDTO temp in os)
             {
                 if (temp.Id != 7)
@@ -52,11 +74,17 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void CargarDataGrid(DataGridView grd, string apenom)
+        public void CargarDataGrid(DataGridView grd, string apenom)
         {
             grd.Rows.Clear();
-            List<ObraSocialDTO> os = new List<ObraSocialDTO>();
-            os = ObraSocialDAL.Buscar(apenom);
+            var (result, message) = obraSocialDAL.Buscar(apenom);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            var os = result;
             foreach (ObraSocialDTO temp in os)
             {
                 if (temp.Id != 7)
@@ -69,10 +97,17 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void Guardar(string nom)
+        public void Guardar(string nom)
         {
             ObraSocialDTO nos = new ObraSocialDTO(nom, true);
-            if (ObraSocialDAL.Guardar(nos))
+            var (save, message) = obraSocialDAL.Guardar(nos);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            if (save)
             {
                 MessageBox.Show(
                     "La Obra Social fue guardada correctamente.",
@@ -90,10 +125,17 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void Editar(int id, string nom, bool estado)
+        public void Editar(int id, string nom, bool estado)
         {
             ObraSocialDTO nos = new ObraSocialDTO(id, nom, estado);
-            if (ObraSocialDAL.Editar(nos))
+            var (save, message) = obraSocialDAL.Editar(nos);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            if (save)
             {
                 MessageBox.Show(
                     "La Obra Social fue modificada correctamente.",

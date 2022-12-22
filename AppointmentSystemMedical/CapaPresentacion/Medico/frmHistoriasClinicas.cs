@@ -11,19 +11,21 @@ namespace AppointmentSystemMedical.CapaPresentacion.Medico
         private PacienteDTO Pac;
         private TurnoDTO Tur;
         private int rowTur;
-
-        public frmHistoriasClinicas(frmPrincipal padre, int paciente)
+        CapaLogica.HistoriaClinica historiaClinica = new CapaLogica.HistoriaClinica();
+        CapaLogica.Paciente paciente = new CapaLogica.Paciente();
+        CapaLogica.Turno turno = new CapaLogica.Turno();
+        public frmHistoriasClinicas(frmPrincipal padre, int idpaciente)
         {
             InitializeComponent();
             Padre = padre;
-            Pac = CapaLogica.Paciente.Buscar(paciente);
+            Pac = paciente.Buscar(idpaciente);
             Tur = null;
             rowTur = -1;
         }
 
         private void frmHistoriasClinicas_Load(object sender, EventArgs e)
         {
-            CapaLogica.HistoriaClinica.CargarDataGrid(grdTurnos, Padre.Sesion, Pac);
+            historiaClinica.CargarDataGrid(grdTurnos, Padre.Sesion, Pac);
         }
 
         private void picButton_MouseEnter(object sender, EventArgs e)
@@ -72,11 +74,11 @@ namespace AppointmentSystemMedical.CapaPresentacion.Medico
             {
                 if (e.ColumnIndex == 0 && grdTurnos.Rows[e.RowIndex].Cells["ExisteHC"].Value.ToString() == "1")
                 {
-                    Padre.AbrirFormPanel(new Medico.frmNuevoHistoriaClinica(Padre, Turno.Buscar((int)grdTurnos.Rows[e.RowIndex].Cells["Id"].Value), 0));
+                    Padre.AbrirFormPanel(new Medico.frmNuevoHistoriaClinica(Padre, turno.Buscar((int)grdTurnos.Rows[e.RowIndex].Cells["Id"].Value), 0));
                 }
                 else
                 {
-                    Tur = Turno.Buscar((int)grdTurnos.Rows[e.RowIndex].Cells["Id"].Value);
+                    Tur = turno.Buscar((int)grdTurnos.Rows[e.RowIndex].Cells["Id"].Value);
                     rowTur = e.RowIndex;
                 }
             }
@@ -86,7 +88,7 @@ namespace AppointmentSystemMedical.CapaPresentacion.Medico
         {
             if (DateTime.Compare(dtpDesde.Value, dtpHasta.Value) < 0)
             {
-                HistoriaClinica.CargarDataGrid(grdTurnos, Padre.Sesion, Pac, dtpDesde.Value, dtpHasta.Value);
+                historiaClinica.CargarDataGrid(grdTurnos, Padre.Sesion, Pac, dtpDesde.Value, dtpHasta.Value);
             }
             else
             {

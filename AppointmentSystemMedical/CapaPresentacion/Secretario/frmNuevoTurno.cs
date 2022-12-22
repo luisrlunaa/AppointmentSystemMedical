@@ -15,7 +15,11 @@ namespace AppointmentSystemMedical.CapaPresentacion.Secretario
         private CoberturaDTO cob;
         private DateTime dia;
         private Busqueda bus;
-
+        CapaLogica.Cobertura cobertura = new CapaLogica.Cobertura();
+        CapaLogica.Turno turno = new CapaLogica.Turno();
+        CapaLogica.TurnoEstado turnoEstado = new CapaLogica.TurnoEstado();
+        CapaLogica.Medico medico = new CapaLogica.Medico();
+        CapaLogica.Paciente paciente = new CapaLogica.Paciente();
         private enum Busqueda
         {
             Medico,
@@ -50,7 +54,7 @@ namespace AppointmentSystemMedical.CapaPresentacion.Secretario
             if (id != -1)
             {
                 lblTitulo.Text = "Editar Turno";
-                TurnoDTO aux = CapaLogica.Turno.Buscar(id);
+                TurnoDTO aux = turno.Buscar(id);
                 med = aux.Medico;
                 txtMedico.Text = med.Empleado.Persona.Apellidos + " " + med.Empleado.Persona.Nombres;
                 pac = aux.Paciente;
@@ -61,12 +65,12 @@ namespace AppointmentSystemMedical.CapaPresentacion.Secretario
                 dtpDia.Value = aux.FechaHora;
                 //cboCobertura.SelectedIndex = cboCobertura.FindStringExact(aux.Cobertura.ObraSocial.Nombre + " - " + aux.Cobertura.Descripcion);
 
-                CapaLogica.Turno.CargarAgenda(grdAgenda, med, dtpDia.Value);
-                grdAgenda.CurrentCell = grdAgenda[3, CapaLogica.Turno.HoraAPeriodo(aux.FechaHora)];
+                turno.CargarAgenda(grdAgenda, med, dtpDia.Value);
+                grdAgenda.CurrentCell = grdAgenda[3, turno.HoraAPeriodo(aux.FechaHora)];
 
                 lblTurnoEstado.Visible = true;
                 cboTurnoEstado.Visible = true;
-                TurnoEstado.CargarComboBox(cboTurnoEstado);
+                turnoEstado.CargarComboBox(cboTurnoEstado);
                 cboTurnoEstado.SelectedIndex = cboTurnoEstado.FindStringExact(aux.Estado.Descripcion);
             }
             pnlBusqueda.Location = new Point(0, 125);
@@ -128,7 +132,7 @@ namespace AppointmentSystemMedical.CapaPresentacion.Secretario
         {
             if (med != null)
             {
-                CapaLogica.Turno.CargarAgenda(grdAgenda, med, dtpDia.Value);
+                turno.CargarAgenda(grdAgenda, med, dtpDia.Value);
             }
         }
 
@@ -139,13 +143,13 @@ namespace AppointmentSystemMedical.CapaPresentacion.Secretario
             // Si esta buscando Medico
             if (bus == Busqueda.Medico)
             {
-                med = CapaLogica.Medico.Buscar(id);
+                med = medico.Buscar(id);
                 txtMedico.Text = med.Empleado.Persona.Apellidos + " " + med.Empleado.Persona.Nombres;
                 dtpDia_ValueChanged(sender, e);
             }
             else
             {
-                pac = CapaLogica.Paciente.Buscar(id);
+                pac = paciente.Buscar(id);
                 txtPaciente.Text = pac.Persona.Apellidos + " " + pac.Persona.Nombres;
             }
 
@@ -155,7 +159,7 @@ namespace AppointmentSystemMedical.CapaPresentacion.Secretario
         private void grdBusqueda2_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             int id = (int)grdBusqueda2.Rows[e.RowIndex].Cells["IdC"].Value;
-            cob = CapaLogica.Cobertura.Buscar(id);
+            cob = cobertura.Buscar(id);
             txtCobertura.Text = (cob.Id == 10) ? "Ninguna" : cob.Descripcion + " - " + cob.ObraSocial.Nombre;
             pnlBusqueda2.Visible = false;
         }
@@ -175,12 +179,12 @@ namespace AppointmentSystemMedical.CapaPresentacion.Secretario
                     // -1 para nuevos turnos
                     if (id == -1)
                     {
-                        Turno.Guardar(med, pac, dia, (cob == null) ? 10 : cob.Id);
+                        turno.Guardar(med, pac, dia, (cob == null) ? 10 : cob.Id);
                     }
                     else
                     {
                         KeyValuePair<int, string> seleccionTurnoEstado = (KeyValuePair<int, string>)cboTurnoEstado.Items[cboTurnoEstado.SelectedIndex];
-                        Turno.Editar(id, med, pac, dia, (cob == null) ? 10 : cob.Id, seleccionTurnoEstado.Key);
+                        turno.Editar(id, med, pac, dia, (cob == null) ? 10 : cob.Id, seleccionTurnoEstado.Key);
 
                     }
                     Padre.AbrirFormPanel(new Secretario.frmComprobanteTurno(this.Padre));
@@ -203,7 +207,7 @@ namespace AppointmentSystemMedical.CapaPresentacion.Secretario
                 }
                 else if (grdAgenda.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString() == "Libre")
                 {
-                    DateTime hora = Turno.PerdiodoAHora(e.RowIndex);
+                    DateTime hora = turno.PerdiodoAHora(e.RowIndex);
 
                     dia = new DateTime(
                         dtpDia.Value.AddDays(e.ColumnIndex - 3).Year,
@@ -314,13 +318,13 @@ namespace AppointmentSystemMedical.CapaPresentacion.Secretario
         private void BuscarMedico()
         {
             int dni;
-            if (Int32.TryParse(txtMedico.Text, out dni))
+            if (int.TryParse(txtMedico.Text, out dni))
             {
-                CapaLogica.Medico.CargarDataGridBusqueda(grdBusqueda, dni);
+                medico.CargarDataGridBusqueda(grdBusqueda, dni);
             }
             else
             {
-                CapaLogica.Medico.CargarDataGridBusqueda(grdBusqueda, txtMedico.Text);
+                medico.CargarDataGridBusqueda(grdBusqueda, txtMedico.Text);
             }
 
             pnlBusqueda.Visible = true;
@@ -332,13 +336,13 @@ namespace AppointmentSystemMedical.CapaPresentacion.Secretario
         private void BuscarPaciente()
         {
             int dni;
-            if (Int32.TryParse(txtPaciente.Text, out dni))
+            if (int.TryParse(txtPaciente.Text, out dni))
             {
-                CapaLogica.Paciente.CargarDataGridBusqueda(grdBusqueda, dni);
+                paciente.CargarDataGridBusqueda(grdBusqueda, dni);
             }
             else
             {
-                CapaLogica.Paciente.CargarDataGridBusqueda(grdBusqueda, txtPaciente.Text);
+                paciente.CargarDataGridBusqueda(grdBusqueda, txtPaciente.Text);
             }
 
             pnlBusqueda.Visible = true;
@@ -349,7 +353,7 @@ namespace AppointmentSystemMedical.CapaPresentacion.Secretario
 
         private void BuscarCobertura()
         {
-            CapaLogica.Cobertura.CargarDataGridBusqueda(grdBusqueda2, txtCobertura.Text);
+            cobertura.CargarDataGridBusqueda(grdBusqueda2, txtCobertura.Text);
             pnlBusqueda2.Visible = true;
         }
     }

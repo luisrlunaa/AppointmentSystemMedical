@@ -19,7 +19,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<EmpleadoDTO> res = new List<EmpleadoDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new Empleado());
+                var classKeys = Data.GetObjectKeys(new Empleado()).Where(x => x != "Persona" && x != "TipoUsuario" && x != "Medico").ToList();
                 var sql = Data.SelectExpression("Empleado", classKeys);
                 var (dtPC, message) = Data.GetList(sql, "EmpleadoDAL.Buscar");
                 if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
@@ -29,20 +29,7 @@ namespace AppointmentSystemMedical.CapaDatos
                 {
                     var s = new EmpleadoDTO();
                     var idPersonal = temp["PersonaId"] != DBNull.Value ? Convert.ToInt32(temp["PersonaId"]) : 0;
-                    if (idPersonal > 0)
-                    {
-                        var personal = personaDAL.Buscar(idPersonal);
-                        if (personal.result != null)
-                            s.Persona = personal.result;
-                    }
-
                     var idTipoUsuario = temp["TipoUsuarioId"] != DBNull.Value ? Convert.ToInt32(temp["TipoUsuarioId"]) : 0;
-                    if (idTipoUsuario > 0)
-                    {
-                        var tipoUsuario = tipoUsuarioDAL.Buscar(idTipoUsuario);
-                        if (tipoUsuario.result != null)
-                            s.TipoUsuario = tipoUsuario.result;
-                    }
 
                     s.Id = temp["EmpleadoId"] != DBNull.Value ? Convert.ToInt32(temp["EmpleadoId"]) : 0;
                     s.Cuil = temp["Cuil"] != DBNull.Value ? Convert.ToString(temp["Cuil"]) : string.Empty;
@@ -50,6 +37,17 @@ namespace AppointmentSystemMedical.CapaDatos
                     s.Contraseña = temp["Contraseña"] != DBNull.Value ? Convert.ToString(temp["Contraseña"]) : string.Empty;
                     s.FechaIngreso = temp["FechaIngreso"] != DBNull.Value ? Convert.ToDateTime(temp["FechaIngreso"]) : DateTime.MinValue;
                     s.Activo = temp["Activo"] != DBNull.Value ? Convert.ToBoolean(temp["Activo"]) : false;
+
+                    if (idPersonal > 0)
+                    {
+                        var personal = personaDAL.Buscar(idPersonal);
+                        if (personal.result != null)
+                            s.Persona = personal.result;
+                    }
+
+                    var tipoUsuario = tipoUsuarioDAL.Buscar(idTipoUsuario);
+                    if (tipoUsuario.result != null)
+                        s.TipoUsuario = tipoUsuario.result;
 
                     res.Add(s);
                 }
@@ -70,27 +68,14 @@ namespace AppointmentSystemMedical.CapaDatos
                 if (id == 0)
                     return (s, "Error Input Invalido, Metodo EmpleadoDAL.BuscarById");
 
-                var classKeys = Data.GetObjectKeys(new Empleado());
+                var classKeys = Data.GetObjectKeys(new Empleado()).Where(x => x != "Persona" && x != "TipoUsuario" && x != "Medico").ToList();
                 var sql = Data.SelectExpression("Empleado", classKeys, WhereExpresion: " WHERE EmpleadoId ='" + id + "'");
                 var (dr, message1) = Data.GetOne(sql, "EmpleadoDAL.BuscarById");
                 if (dr is null)
                     return (s, message1);
 
                 var idPersonal = dr["PersonaId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("PersonaId")) : 0;
-                if (idPersonal > 0)
-                {
-                    var personal = personaDAL.Buscar(idPersonal);
-                    if (personal.result != null)
-                        s.Persona = personal.result;
-                }
-
                 var idTipoUsuario = dr["TipoUsuarioId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("TipoUsuarioId")) : 0;
-                if (idTipoUsuario > 0)
-                {
-                    var tipoUsuario = tipoUsuarioDAL.Buscar(idTipoUsuario);
-                    if (tipoUsuario.result != null)
-                        s.TipoUsuario = tipoUsuario.result;
-                }
 
                 s.Id = dr["EmpleadoId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("EmpleadoId")) : 0;
                 s.Cuil = dr["Cuil"].GetType() != typeof(DBNull) ? dr.GetString(dr.GetOrdinal("Cuil")) : string.Empty;
@@ -98,6 +83,17 @@ namespace AppointmentSystemMedical.CapaDatos
                 s.Contraseña = dr["Contraseña"].GetType() != typeof(DBNull) ? dr.GetString(dr.GetOrdinal("Contraseña")) : string.Empty;
                 s.FechaIngreso = dr["FechaIngreso"].GetType() != typeof(DBNull) ? dr.GetDateTime(dr.GetOrdinal("FechaIngreso")) : DateTime.MinValue;
                 s.Activo = dr["Activo"].GetType() != typeof(DBNull) ? dr.GetBoolean(dr.GetOrdinal("Activo")) : false;
+
+                if (idPersonal > 0)
+                {
+                    var personal = personaDAL.Buscar(idPersonal);
+                    if (personal.result != null)
+                        s.Persona = personal.result;
+                }
+
+                var tipoUsuario = tipoUsuarioDAL.Buscar(idTipoUsuario);
+                if (tipoUsuario.result != null)
+                    s.TipoUsuario = tipoUsuario.result;
 
                 return (s, "Proceso Completado");
             }
@@ -113,7 +109,7 @@ namespace AppointmentSystemMedical.CapaDatos
             try
             {
                 var join = Data.JoinExpression("INNER", new List<string>() { "Empleado" }, new List<string>() { "Persona" }, new List<string>() { "PersonaId" });
-                var classKeys = Data.GetObjectKeys(new Empleado());
+                var classKeys = Data.GetObjectKeys(new Empleado()).Where(x => x != "Persona" && x != "TipoUsuario" && x != "Medico").ToList();
                 var sql = Data.SelectExpression("Empleado", classKeys, JoinExp: join, WhereExpresion: "Where Persona.Dni = '" + dni + "'");
                 var (dtPC, message) = Data.GetList(sql, "EmpleadoDAL.BuscarDni");
                 if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
@@ -123,20 +119,7 @@ namespace AppointmentSystemMedical.CapaDatos
                 {
                     var s = new EmpleadoDTO();
                     var idPersonal = temp["PersonaId"] != DBNull.Value ? Convert.ToInt32(temp["PersonaId"]) : 0;
-                    if (idPersonal > 0)
-                    {
-                        var personal = personaDAL.Buscar(idPersonal);
-                        if (personal.result != null)
-                            s.Persona = personal.result;
-                    }
-
                     var idTipoUsuario = temp["TipoUsuarioId"] != DBNull.Value ? Convert.ToInt32(temp["TipoUsuarioId"]) : 0;
-                    if (idTipoUsuario > 0)
-                    {
-                        var tipoUsuario = tipoUsuarioDAL.Buscar(idTipoUsuario);
-                        if (tipoUsuario.result != null)
-                            s.TipoUsuario = tipoUsuario.result;
-                    }
 
                     s.Id = temp["EmpleadoId"] != DBNull.Value ? Convert.ToInt32(temp["EmpleadoId"]) : 0;
                     s.Cuil = temp["Cuil"] != DBNull.Value ? Convert.ToString(temp["Cuil"]) : string.Empty;
@@ -144,6 +127,17 @@ namespace AppointmentSystemMedical.CapaDatos
                     s.Contraseña = temp["Contraseña"] != DBNull.Value ? Convert.ToString(temp["Contraseña"]) : string.Empty;
                     s.FechaIngreso = temp["FechaIngreso"] != DBNull.Value ? Convert.ToDateTime(temp["FechaIngreso"]) : DateTime.MinValue;
                     s.Activo = temp["Activo"] != DBNull.Value ? Convert.ToBoolean(temp["Activo"]) : false;
+
+                    if (idPersonal > 0)
+                    {
+                        var personal = personaDAL.Buscar(idPersonal);
+                        if (personal.result != null)
+                            s.Persona = personal.result;
+                    }
+
+                    var tipoUsuario = tipoUsuarioDAL.Buscar(idTipoUsuario);
+                    if (tipoUsuario.result != null)
+                        s.TipoUsuario = tipoUsuario.result;
 
                     res.Add(s);
                 }
@@ -162,7 +156,7 @@ namespace AppointmentSystemMedical.CapaDatos
             try
             {
                 var join = Data.JoinExpression("INNER", new List<string>() { "Empleado" }, new List<string>() { "Persona" }, new List<string>() { "PersonaId" });
-                var classKeys = Data.GetObjectKeys(new Empleado());
+                var classKeys = Data.GetObjectKeys(new Empleado()).Where(x => x != "Persona" && x != "TipoUsuario" && x != "Medico").ToList();
                 var sql = Data.SelectExpression("Empleado", classKeys, JoinExp: join, WhereExpresion: "Where Persona.Apellidos LIKE '%" + apenom + "%' OR Persona.Nombres LIKE '%" + apenom + "%'");
                 var (dtPC, message) = Data.GetList(sql, "EmpleadoDAL.BuscarApeNom");
                 if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
@@ -172,6 +166,14 @@ namespace AppointmentSystemMedical.CapaDatos
                 {
                     var s = new EmpleadoDTO();
                     var idPersonal = temp["PersonaId"] != DBNull.Value ? Convert.ToInt32(temp["PersonaId"]) : 0;
+                    var idTipoUsuario = temp["TipoUsuarioId"] != DBNull.Value ? Convert.ToInt32(temp["TipoUsuarioId"]) : 4;
+                    s.Id = temp["EmpleadoId"] != DBNull.Value ? Convert.ToInt32(temp["EmpleadoId"]) : 0;
+                    s.Cuil = temp["Cuil"] != DBNull.Value ? Convert.ToString(temp["Cuil"]) : string.Empty;
+                    s.Usuario = temp["Usuario"] != DBNull.Value ? Convert.ToString(temp["Usuario"]) : string.Empty;
+                    s.Contraseña = temp["Contraseña"] != DBNull.Value ? Convert.ToString(temp["Contraseña"]) : string.Empty;
+                    s.FechaIngreso = temp["FechaIngreso"] != DBNull.Value ? Convert.ToDateTime(temp["FechaIngreso"]) : DateTime.MinValue;
+                    s.Activo = temp["Activo"] != DBNull.Value ? Convert.ToBoolean(temp["Activo"]) : false;
+
                     if (idPersonal > 0)
                     {
                         var personal = personaDAL.Buscar(idPersonal);
@@ -179,20 +181,9 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Persona = personal.result;
                     }
 
-                    var idTipoUsuario = temp["TipoUsuarioId"] != DBNull.Value ? Convert.ToInt32(temp["TipoUsuarioId"]) : 0;
-                    if (idTipoUsuario > 0)
-                    {
-                        var tipoUsuario = tipoUsuarioDAL.Buscar(idTipoUsuario);
-                        if (tipoUsuario.result != null)
-                            s.TipoUsuario = tipoUsuario.result;
-                    }
-
-                    s.Id = temp["EmpleadoId"] != DBNull.Value ? Convert.ToInt32(temp["EmpleadoId"]) : 0;
-                    s.Cuil = temp["Cuil"] != DBNull.Value ? Convert.ToString(temp["Cuil"]) : string.Empty;
-                    s.Usuario = temp["Usuario"] != DBNull.Value ? Convert.ToString(temp["Usuario"]) : string.Empty;
-                    s.Contraseña = temp["Contraseña"] != DBNull.Value ? Convert.ToString(temp["Contraseña"]) : string.Empty;
-                    s.FechaIngreso = temp["FechaIngreso"] != DBNull.Value ? Convert.ToDateTime(temp["FechaIngreso"]) : DateTime.MinValue;
-                    s.Activo = temp["Activo"] != DBNull.Value ? Convert.ToBoolean(temp["Activo"]) : false;
+                    var tipoUsuario = tipoUsuarioDAL.Buscar(idTipoUsuario);
+                    if (tipoUsuario.result != null)
+                        s.TipoUsuario = tipoUsuario.result;
 
                     res.Add(s);
                 }
@@ -213,27 +204,11 @@ namespace AppointmentSystemMedical.CapaDatos
                 if (string.IsNullOrWhiteSpace(usuario))
                     return (s, "Error Input Invalido, Metodo EmpleadoDAL.BuscarByUsuario");
 
-                var classKeys = Data.GetObjectKeys(new Empleado());
+                var classKeys = Data.GetObjectKeys(new Empleado()).Where(x => x != "Persona" && x != "TipoUsuario" && x != "Medico").ToList();
                 var sql = Data.SelectExpression("Empleado", classKeys, WhereExpresion: " WHERE Usuario ='" + usuario + "'");
                 var (dr, message1) = Data.GetOne(sql, "EmpleadoDAL.BuscarByUsuario");
                 if (dr is null)
                     return (s, message1);
-
-                var idPersonal = dr["PersonaId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("PersonaId")) : 0;
-                if (idPersonal > 0)
-                {
-                    var personal = personaDAL.Buscar(idPersonal);
-                    if (personal.result != null)
-                        s.Persona = personal.result;
-                }
-
-                var idTipoUsuario = dr["TipoUsuarioId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("TipoUsuarioId")) : 0;
-                if (idTipoUsuario > 0)
-                {
-                    var tipoUsuario = tipoUsuarioDAL.Buscar(idTipoUsuario);
-                    if (tipoUsuario.result != null)
-                        s.TipoUsuario = tipoUsuario.result;
-                }
 
                 s.Id = dr["EmpleadoId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("EmpleadoId")) : 0;
                 s.Cuil = dr["Cuil"].GetType() != typeof(DBNull) ? dr.GetString(dr.GetOrdinal("Cuil")) : string.Empty;
@@ -241,6 +216,19 @@ namespace AppointmentSystemMedical.CapaDatos
                 s.Contraseña = dr["Contraseña"].GetType() != typeof(DBNull) ? dr.GetString(dr.GetOrdinal("Contraseña")) : string.Empty;
                 s.FechaIngreso = dr["FechaIngreso"].GetType() != typeof(DBNull) ? dr.GetDateTime(dr.GetOrdinal("FechaIngreso")) : DateTime.MinValue;
                 s.Activo = dr["Activo"].GetType() != typeof(DBNull) ? dr.GetBoolean(dr.GetOrdinal("Activo")) : false;
+                var idTipoUsuario = dr["TipoUsuarioId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("TipoUsuarioId")) : 4;
+                var idPersonal = dr["PersonaId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("PersonaId")) : 0;
+
+                if (idPersonal > 0)
+                {
+                    var personal = personaDAL.Buscar(idPersonal);
+                    if (personal.result != null)
+                        s.Persona = personal.result;
+                }
+
+                var tipoUsuario = tipoUsuarioDAL.Buscar(idTipoUsuario);
+                if (tipoUsuario.result != null)
+                    s.TipoUsuario = tipoUsuario.result;
 
                 return (s, "Proceso Completado");
             }
@@ -259,7 +247,7 @@ namespace AppointmentSystemMedical.CapaDatos
 
                 var parameters = new List<string> { "'" + input.Cuil + "'", "'" + input.Usuario + "'", "'" + input.Contraseña + "'",
                     "'" + input.FechaIngreso + "'", "'" + input.Activo + "'", "'" + input.TipoUsuario.Id + "'" };
-                var classKeys = Data.GetObjectKeys(new Empleado()).Where(x => x != "EmpleadoId").ToList();
+                var classKeys = Data.GetObjectKeys(new Empleado()).Where(x => x != "EmpleadoId" && x != "Persona" && x != "TipoUsuario" && x != "Medico").ToList();
                 var sql = Data.InsertExpression("Empleado", classKeys, parameters);
                 var (response, message) = Data.CrudAction(sql, "EmpleadoDAL.Guardar");
                 if (!response)
@@ -282,7 +270,7 @@ namespace AppointmentSystemMedical.CapaDatos
 
                 var parameters = new List<string> { "'" + input.Cuil + "'", "'" + input.Usuario + "'", "'" + input.Contraseña + "'",
                     "'" + input.FechaIngreso + "'", "'" + input.Activo + "'", "'" + input.TipoUsuario.Id + "'" };
-                var classKeys = Data.GetObjectKeys(new Empleado()).Where(x => x != "EmpleadoId").ToList();
+                var classKeys = Data.GetObjectKeys(new Empleado()).Where(x => x != "EmpleadoId" && x != "Persona" && x != "TipoUsuario" && x != "Medico").ToList();
                 var sql = Data.UpdateExpression("Empleado", classKeys, parameters, " WHERE EmpleadoId = '" + input.Id + "'");
                 var (response, message) = Data.CrudAction(sql, "EmpleadoDAL.Editar");
                 if (!response)

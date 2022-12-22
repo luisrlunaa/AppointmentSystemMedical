@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AppointmentSystemMedical.CapaLogica;
+using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace AppointmentSystemMedical.CapaPresentacion.Administrador
@@ -6,7 +8,7 @@ namespace AppointmentSystemMedical.CapaPresentacion.Administrador
     public partial class frmObraSociales : Form
     {
         private frmPrincipal Padre;
-
+        ObraSocial obraSocial = new ObraSocial();
         public frmObraSociales(frmPrincipal padre)
         {
             InitializeComponent();
@@ -15,7 +17,7 @@ namespace AppointmentSystemMedical.CapaPresentacion.Administrador
 
         private void frmObraSociales_Load(object sender, EventArgs e)
         {
-            ObraSocial.CargarDataGrid(grdObraSociales);
+            obraSocial.CargarDataGrid(grdObraSociales);
             AdministrarPermisos();
         }
 
@@ -81,11 +83,11 @@ namespace AppointmentSystemMedical.CapaPresentacion.Administrador
 
             if (txtBuscar.Text == "")
             {
-                ObraSocial.CargarDataGrid(grdObraSociales);
+                obraSocial.CargarDataGrid(grdObraSociales);
             }
             else
             {
-                ObraSocial.CargarDataGrid(grdObraSociales, txtBuscar.Text);
+                obraSocial.CargarDataGrid(grdObraSociales, txtBuscar.Text);
             }
         }
 

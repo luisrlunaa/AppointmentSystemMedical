@@ -45,7 +45,7 @@ namespace AppointmentSystemMedical.CapaDatos
                 if (id <= 0)
                     return (s, "Error Input Invalido, Metodo EspecialidadDAL.BuscarById");
 
-                var classKeys = Data.GetObjectKeys(new TurnoEstado());
+                var classKeys = Data.GetObjectKeys(new TurnoEstado()).Where(x=> x != "Medico").ToList();
                 var sql = Data.SelectExpression("Especialidad", classKeys, WhereExpresion: " WHERE Id ='" + id + "'");
                 var (dr, message1) = Data.GetOne(sql, "EspecialidadDAL.BuscarById");
                 if (dr is null)
@@ -68,7 +68,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<EspecialidadDTO> res = new List<EspecialidadDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new Especialidad());
+                var classKeys = Data.GetObjectKeys(new Especialidad()).Where(x => x != "Medico").ToList();
                 var sql = Data.SelectExpression("Especialidad", classKeys, WhereExpresion: "WHERE Especialidad.Descripcion Like '" + apenom + "'");
                 var (dtPC, message) = Data.GetList(sql, "EspecialidadDAL.BuscarByDescription");
                 if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
@@ -97,7 +97,7 @@ namespace AppointmentSystemMedical.CapaDatos
                     return (false, "Error Input Invalido, Metodo EspecialidadDAL.Guardar");
 
                 var parameters = new List<string> { "'" + input.Descripcion + "'" };
-                var classKeys = Data.GetObjectKeys(new Especialidad()).Where(x => x != "Id").ToList();
+                var classKeys = Data.GetObjectKeys(new Especialidad()).Where(x => x != "Id" && x != "Medico").ToList();
                 var sql = Data.InsertExpression("Especialidad", classKeys, parameters);
                 var (response, message) = Data.CrudAction(sql, "EspecialidadDAL.Guardar");
                 if (!response)
@@ -119,7 +119,7 @@ namespace AppointmentSystemMedical.CapaDatos
                     return (false, "Error Input Invalido, Metodo EspecialidadDAL.Editar");
 
                 var parameters = new List<string> { "'" + input.Descripcion + "'" };
-                var classKeys = Data.GetObjectKeys(new Especialidad()).Where(x => x != "Id").ToList();
+                var classKeys = Data.GetObjectKeys(new Especialidad()).Where(x => x != "Id" && x != "Medico").ToList();
                 var sql = Data.UpdateExpression("Especialidad", classKeys, parameters, " WHERE Id = '" + input.Id + "'");
                 var (response, message) = Data.CrudAction(sql, "EspecialidadDAL.Editar");
                 if (!response)

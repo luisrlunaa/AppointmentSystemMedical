@@ -1,6 +1,6 @@
 ﻿using AppointmentSystemMedical.CapaDatos;
+using AppointmentSystemMedical.Model.DTOs;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -8,23 +8,45 @@ namespace AppointmentSystemMedical.CapaLogica
 {
     public class Empleado
     {
-        public static EmpleadoDTO BuscarDni(string dni)
+        EmpleadoDAL empleadoDAL = new EmpleadoDAL();
+        TipoUsuarioDAL tipoUsuarioDAL = new TipoUsuarioDAL();
+        PersonaDAL personaDAL = new PersonaDAL();
+        public EmpleadoDTO BuscarDni(string dni)
         {
-            return EmpleadoDAL.BuscarDni(dni).ElementAt(0);
+            var (result, message) = empleadoDAL.BuscarDni(dni);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            return result.FirstOrDefault();
         }
 
-        public static EmpleadoDTO Ingresar(string usuario, string contraseña)
+        public EmpleadoDTO Ingresar(string usuario, string contraseña)
         {
-            EmpleadoDTO buscado = EmpleadoDAL.BuscarUsuario(usuario);
+            var (result, message) = empleadoDAL.BuscarUsuario(usuario);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
             // fix cifrar
-            return (buscado != null && buscado.Activo && buscado.Contraseña.Equals(contraseña)) ? buscado : null;
+            return (result != null && result.Activo && result.Contraseña.Equals(contraseña)) ? result : null;
         }
 
-        public static void CargarDataGrid(DataGridView grd)
+        public void CargarDataGrid(DataGridView grd)
         {
             grd.Rows.Clear();
-            List<EmpleadoDTO> empleados = new List<EmpleadoDTO>();
-            empleados = EmpleadoDAL.Buscar();
+            var (result, message) = empleadoDAL.Buscar();
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            var empleados = result;
             foreach (EmpleadoDTO emp in empleados)
             {
                 grd.Rows.Add(
@@ -46,11 +68,17 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void CargarDataGrid(DataGridView grd, int dni)
+        public void CargarDataGrid(DataGridView grd, int dni)
         {
             grd.Rows.Clear();
-            List<EmpleadoDTO> empleados = new List<EmpleadoDTO>();
-            empleados = EmpleadoDAL.BuscarDni(dni.ToString());
+            var (result, message) = empleadoDAL.BuscarDni(dni.ToString());
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            var empleados = result;
             foreach (EmpleadoDTO emp in empleados)
             {
                 grd.Rows.Add(
@@ -72,11 +100,17 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void CargarDataGrid(DataGridView grd, string apenom)
+        public void CargarDataGrid(DataGridView grd, string apenom)
         {
             grd.Rows.Clear();
-            List<EmpleadoDTO> empleados = new List<EmpleadoDTO>();
-            empleados = EmpleadoDAL.BuscarApeNom(apenom);
+            var (result, message) = empleadoDAL.BuscarApeNom(apenom);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            var empleados = result;
             foreach (EmpleadoDTO emp in empleados)
             {
                 grd.Rows.Add(
@@ -98,13 +132,28 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void Guardar(string dni, string ape, string nom, DateTime fn, string sexo,
+        public void Guardar(string dni, string ape, string nom, DateTime fn, string sexo,
             string correo, string tel, string cuil, string usuario, string contra, DateTime fi,
             int tipo, bool activo)
         {
+            var (tipoUser, message) = tipoUsuarioDAL.Buscar(tipo);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
             PersonaDTO per = new PersonaDTO(dni, ape, nom, fn, sexo, correo, tel);
-            EmpleadoDTO emp = new EmpleadoDTO(per, cuil, usuario, contra, fi, TipoUsuarioDAL.Buscar(tipo), activo);
-            if (EmpleadoDAL.Guardar(emp))
+            EmpleadoDTO emp = new EmpleadoDTO(per, cuil, usuario, contra, fi, tipoUser, activo);
+
+            var (save, message1) = empleadoDAL.Guardar(emp);
+            if (message1.Contains("Error"))
+                MessageBox.Show(message1,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            if (save)
             {
                 MessageBox.Show(
                     "El Empleado fue guardado correctamente.",
@@ -122,18 +171,38 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void Editar(int id, string dni, string ape, string nom, DateTime fn,
+        public void Editar(int id, string dni, string ape, string nom, DateTime fn,
             string sexo, string correo, string tel, string cuil, string usuario, string contra,
             DateTime fi, int tipo, bool activo)
         {
-            PersonaDTO per = PersonaDAL.BuscarDni(dni).ElementAt(0);
+            var (tipoUser, message) = tipoUsuarioDAL.Buscar(tipo);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            var (result, message1) = personaDAL.BuscarDni(dni);
+            if (message1.Contains("Error"))
+                MessageBox.Show(message1,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            var per = result.FirstOrDefault();
+
             per.Apellidos = ape;
             per.Nombres = nom;
             per.Sexo = sexo;
             per.CorreoElectronico = correo;
             per.Telefono = tel;
-            EmpleadoDTO modificado = new EmpleadoDTO(id, per, cuil, usuario, contra, fi, TipoUsuarioDAL.Buscar(tipo), activo);
-            if (EmpleadoDAL.Editar(modificado))
+            EmpleadoDTO modificado = new EmpleadoDTO(id, per, cuil, usuario, contra, fi, tipoUser, activo);
+
+            var (save, message2) = empleadoDAL.Guardar(modificado);
+            if (message2.Contains("Error"))
+                MessageBox.Show(message2);
+
+            if (save)
             {
                 MessageBox.Show(
                     "El Empleado fue modificado correctamente.",
@@ -151,7 +220,7 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        private static int CalcularAños(DateTime fecha)
+        private int CalcularAños(DateTime fecha)
         {
             int aux = DateTime.Now.Year - fecha.Year;
             if (DateTime.Now.Month < fecha.Month || (DateTime.Now.Month == fecha.Month && DateTime.Now.Day < fecha.Day))

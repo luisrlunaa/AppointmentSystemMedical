@@ -1,4 +1,5 @@
 ﻿using AppointmentSystemMedical.CapaDatos;
+using AppointmentSystemMedical.Model.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
@@ -7,11 +8,19 @@ namespace AppointmentSystemMedical.CapaLogica
 {
     public class TipoUsuario
     {
-        public static void CargarComboBox(ComboBox cb)
+        TipoUsuarioDAL tipoUsuarioDAL = new TipoUsuarioDAL();
+        public void CargarComboBox(ComboBox cb)
         {
+            var (result, message) = tipoUsuarioDAL.Buscar();
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
             int ancho = 0;
             int maximo = 0;
-            foreach (TipoUsuarioDTO temp in TipoUsuarioDAL.Buscar())
+            foreach (TipoUsuarioDTO temp in result)
             {
                 // calculo en ancho mas largo de texto
                 ancho = TextRenderer.MeasureText(temp.Descripcion, cb.Font).Width;

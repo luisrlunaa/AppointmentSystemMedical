@@ -9,7 +9,7 @@ namespace AppointmentSystemMedical.CapaPresentacion.Secretario
     {
         private frmPrincipal Padre;
         private int Id;
-
+        CapaLogica.Paciente paciente = new CapaLogica.Paciente();
         public frmNuevoPaciente(frmPrincipal padre)
         {
             InitializeComponent();
@@ -28,7 +28,7 @@ namespace AppointmentSystemMedical.CapaPresentacion.Secretario
         {
             if (Id != -1)
             {
-                PacienteDTO pac = CapaLogica.Paciente.Buscar(Id);
+                PacienteDTO pac = paciente.Buscar(Id);
 
                 lblTitulo.Text = "Editar Paciente";
                 txtApellidos.Text = pac.Persona.Apellidos;
@@ -66,14 +66,14 @@ namespace AppointmentSystemMedical.CapaPresentacion.Secretario
                 {
                     if (Id == -1)
                     {
-                        CapaLogica.Paciente.Guardar(
+                        paciente.Guardar(
                             txtDni.Text, txtApellidos.Text, txtNombres.Text,
                             dtpFechaNacimiento.Value, (rdbMasculino.Checked) ? "M" : "F",
                             txtCorreoElectronico.Text, txtTelefono.Text);
                     }
                     else
                     {
-                        CapaLogica.Paciente.Editar(
+                        paciente.Editar(
                             Id, txtDni.Text, txtApellidos.Text, txtNombres.Text,
                             dtpFechaNacimiento.Value, (rdbMasculino.Checked) ? "M" : "F",
                             txtCorreoElectronico.Text, txtTelefono.Text);
@@ -133,17 +133,17 @@ namespace AppointmentSystemMedical.CapaPresentacion.Secretario
             Regex rgx = new Regex(@"[^\s]+@[^\s]+\.[a-zA-Z]+");
             errNuevoPaciente.Clear();
 
-            if (String.IsNullOrWhiteSpace(txtApellidos.Text))
+            if (string.IsNullOrWhiteSpace(txtApellidos.Text))
             {
                 errNuevoPaciente.SetError(txtApellidos, "Debe ingresar un Apellido");
                 camposValidos = false;
             }
-            if (String.IsNullOrWhiteSpace(txtNombres.Text))
+            if (string.IsNullOrWhiteSpace(txtNombres.Text))
             {
                 errNuevoPaciente.SetError(txtNombres, "Debe ingresar un Nombre");
                 camposValidos = false;
             }
-            if (String.IsNullOrWhiteSpace(txtDni.Text))
+            if (string.IsNullOrWhiteSpace(txtDni.Text))
             {
                 errNuevoPaciente.SetError(txtDni, "Debe ingresar el DNI");
                 camposValidos = false;
@@ -153,12 +153,12 @@ namespace AppointmentSystemMedical.CapaPresentacion.Secretario
                 errNuevoPaciente.SetError(dtpFechaNacimiento, "Debe ingresar una Fecha de Nacimiento válida");
                 camposValidos = false;
             }
-            if (String.IsNullOrWhiteSpace(txtTelefono.Text))
+            if (string.IsNullOrWhiteSpace(txtTelefono.Text))
             {
                 errNuevoPaciente.SetError(txtTelefono, "Debe ingresar un Telefono");
                 camposValidos = false;
             }
-            if (String.IsNullOrWhiteSpace(txtCorreoElectronico.Text) || !rgx.IsMatch(txtCorreoElectronico.Text))
+            if (string.IsNullOrWhiteSpace(txtCorreoElectronico.Text) || !rgx.IsMatch(txtCorreoElectronico.Text))
             {
                 errNuevoPaciente.SetError(txtCorreoElectronico, "Debe ingresar un Correo Electronico válido");
                 camposValidos = false;

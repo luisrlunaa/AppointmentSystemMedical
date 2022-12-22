@@ -12,7 +12,10 @@ namespace AppointmentSystemMedical.CapaLogica
         {
             var (c, message) = coberturaDAL.Buscar(id);
             if (message.Contains("Error"))
-                return new CoberturaDTO();
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
 
             return c;
         }
@@ -21,6 +24,12 @@ namespace AppointmentSystemMedical.CapaLogica
         {
             grd.Rows.Clear();
             var (coberturas, message) = coberturaDAL.Buscar();
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
             foreach (CoberturaDTO temp in coberturas)
             {
                 if (temp.Id != 10)
@@ -38,6 +47,12 @@ namespace AppointmentSystemMedical.CapaLogica
         {
             grd.Rows.Clear();
             var (coberturas, message) = coberturaDAL.Buscar(apenom);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
             foreach (CoberturaDTO temp in coberturas)
             {
                 if (temp.Id != 10)
@@ -55,6 +70,12 @@ namespace AppointmentSystemMedical.CapaLogica
         {
             grd.Rows.Clear();
             var (coberturas, message) = coberturaDAL.Buscar(apenom);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
             foreach (CoberturaDTO temp in coberturas)
             {
                 if (temp.Id != 10 && temp.Estado)

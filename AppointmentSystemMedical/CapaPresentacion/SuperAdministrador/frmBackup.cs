@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AppointmentSystemMedical.CapaLogica;
+using System;
 using System.Windows.Forms;
 
 namespace AppointmentSystemMedical.CapaPresentacion.SuperAdministrador

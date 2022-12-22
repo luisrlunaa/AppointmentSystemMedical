@@ -1,4 +1,5 @@
-﻿using AppointmentSystemMedical.Model.DTOs;
+﻿using AppointmentSystemMedical.CapaLogica;
+using AppointmentSystemMedical.Model.DTOs;
 using System;
 using System.Windows.Forms;
 
@@ -8,7 +9,7 @@ namespace AppointmentSystemMedical.CapaPresentacion.Administrador
     {
         private frmPrincipal Padre;
         private int Id;
-
+        ObraSocial obraSocial = new ObraSocial();
         public frmNuevoObraSocial(frmPrincipal padre)
         {
             InitializeComponent();
@@ -28,7 +29,7 @@ namespace AppointmentSystemMedical.CapaPresentacion.Administrador
             if (Id != -1)
             {
                 lblTitulo.Text = "Editar Obra Social";
-                ObraSocialDTO os = ObraSocial.Buscar(Id);
+                ObraSocialDTO os = obraSocial.Buscar(Id);
                 txtNombre.Text = os.Nombre;
                 chkActivo.Checked = os.Estado;
                 chkActivo.Visible = true;
@@ -49,11 +50,11 @@ namespace AppointmentSystemMedical.CapaPresentacion.Administrador
                 {
                     if (Id == -1)
                     {
-                        ObraSocial.Guardar(txtNombre.Text);
+                        obraSocial.Guardar(txtNombre.Text);
                     }
                     else
                     {
-                        ObraSocial.Editar(Id, txtNombre.Text, chkActivo.Checked);
+                        obraSocial.Editar(Id, txtNombre.Text, chkActivo.Checked);
                     }
                     Padre.AbrirFormPanel(new frmObraSociales(Padre));
                 }

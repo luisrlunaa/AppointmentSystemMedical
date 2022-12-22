@@ -16,7 +16,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<ObraSocialDTO> res = new List<ObraSocialDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new ObraSocial());
+                var classKeys = Data.GetObjectKeys(new ObraSocial()).Where(x => x != "Cobertura").ToList(); ;
                 var sql = Data.SelectExpression("ObraSocial", classKeys);
                 var (dtPC, message) = Data.GetList(sql, "ObraSocialDAL.Buscar");
                 if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
@@ -46,7 +46,7 @@ namespace AppointmentSystemMedical.CapaDatos
                 if (id <= 0)
                     return (s, "Error Input Invalido, Metodo ObraSocialDAL.BuscarById");
 
-                var classKeys = Data.GetObjectKeys(new ObraSocial());
+                var classKeys = Data.GetObjectKeys(new ObraSocial()).Where(x => x != "Cobertura").ToList();
                 var sql = Data.SelectExpression("ObraSocial", classKeys, WhereExpresion: " WHERE ObraSocialId ='" + id + "'");
                 var (dr, message1) = Data.GetOne(sql, "ObraSocialDAL.BuscarById");
                 if (dr is null)
@@ -70,7 +70,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<ObraSocialDTO> res = new List<ObraSocialDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new ObraSocial());
+                var classKeys = Data.GetObjectKeys(new ObraSocial()).Where(x => x != "Cobertura").ToList();
                 var sql = Data.SelectExpression("ObraSocial", classKeys, WhereExpresion: "Where ObraSocial.Nombre Like '" + apenom + "'");
                 var (dtPC, message) = Data.GetList(sql, "ObraSocialDAL.Buscar");
                 if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
@@ -100,7 +100,7 @@ namespace AppointmentSystemMedical.CapaDatos
                     return (false, "Error Input Invalido, Metodo ObraSocialDAL.Guardar");
 
                 var parameters = new List<string> { "'" + input.Nombre + "'", "'" + input.Estado + "'" };
-                var classKeys = Data.GetObjectKeys(new ObraSocial()).Where(x => x != "ObraSocialId").ToList();
+                var classKeys = Data.GetObjectKeys(new ObraSocial()).Where(x => x != "ObraSocialId" && x != "Cobertura").ToList();
                 var sql = Data.InsertExpression("ObraSocial", classKeys, parameters);
                 var (response, message) = Data.CrudAction(sql, "ObraSocialDAL.Guardar");
                 if (!response)
@@ -122,7 +122,7 @@ namespace AppointmentSystemMedical.CapaDatos
                     return (false, "Error Input Invalido, Metodo ObraSocialDAL.Editar");
 
                 var parameters = new List<string> { "'" + input.Nombre + "'", "'" + input.Estado + "'" };
-                var classKeys = Data.GetObjectKeys(new ObraSocial()).Where(x => x != "ObraSocialId").ToList();
+                var classKeys = Data.GetObjectKeys(new ObraSocial()).Where(x => x != "ObraSocialId" && x != "Cobertura").ToList();
                 var sql = Data.UpdateExpression("ObraSocial", classKeys, parameters, " WHERE ObraSocialId = '" + input.Id + "'");
                 var (response, message) = Data.CrudAction(sql, "ObraSocialDAL.Editar");
                 if (!response)

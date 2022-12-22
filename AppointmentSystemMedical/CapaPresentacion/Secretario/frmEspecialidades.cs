@@ -7,7 +7,7 @@ namespace AppointmentSystemMedical.CapaPresentacion.Secretario
     public partial class frmEspecialidades : Form
     {
         private frmPrincipal Padre;
-
+        CapaLogica.Especialidad especialidad = new CapaLogica.Especialidad();
         public frmEspecialidades(frmPrincipal padre)
         {
             InitializeComponent();
@@ -17,7 +17,7 @@ namespace AppointmentSystemMedical.CapaPresentacion.Secretario
         private void frmEspecialidades_Load(object sender, EventArgs e)
         {
             AdministrarPermisos();
-            CapaLogica.Especialidad.CargarDataGrid(grdEspecialidades);
+            especialidad.CargarDataGrid(grdEspecialidades);
         }
 
         private void txtBuscar_Enter(object sender, EventArgs e)
@@ -94,11 +94,11 @@ namespace AppointmentSystemMedical.CapaPresentacion.Secretario
 
             if (txtBuscar.Text == "")
             {
-                CapaLogica.Especialidad.CargarDataGrid(grdEspecialidades);
+                especialidad.CargarDataGrid(grdEspecialidades);
             }
             else
             {
-                CapaLogica.Especialidad.CargarDataGrid(grdEspecialidades, txtBuscar.Text);
+                especialidad.CargarDataGrid(grdEspecialidades, txtBuscar.Text);
             }
         }
     }

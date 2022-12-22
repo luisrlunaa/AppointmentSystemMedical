@@ -1,24 +1,45 @@
 ﻿using AppointmentSystemMedical.CapaDatos;
+using AppointmentSystemMedical.Model.DTOs;
 using System;
-using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace AppointmentSystemMedical.CapaLogica
 {
     public class HistoriaClinica
     {
-        public static HistoriaClinicaDTO BuscarTurno(TurnoDTO tur)
+        HistoriaClinicaDAL historiaClinicaDAL = new HistoriaClinicaDAL();
+        TurnoDAL turnoDAL = new TurnoDAL();
+        public HistoriaClinicaDTO BuscarTurno(TurnoDTO tur)
         {
-            return HistoriaClinicaDAL.Buscar(tur);
+            var (result, message) = historiaClinicaDAL.Buscar(tur);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            return result;
         }
 
-        public static void CargarDataGrid(DataGridView grd, EmpleadoDTO emp, PacienteDTO pac)
+        public void CargarDataGrid(DataGridView grd, EmpleadoDTO emp, PacienteDTO pac)
         {
             grd.Rows.Clear();
-            List<TurnoDTO> turnos = new List<TurnoDTO>();
-            turnos = TurnoDAL.BuscarDni(emp, pac.Persona.Dni);
-            List<HistoriaClinicaDTO> hcs = new List<HistoriaClinicaDTO>();
-            hcs = HistoriaClinicaDAL.Buscar(emp, pac);
+            var (result1, message1) = turnoDAL.BuscarDni(emp, pac.Persona.Dni);
+            if (message1.Contains("Error"))
+                MessageBox.Show(message1,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+            var turnos = result1;
+
+            var (result, message) = historiaClinicaDAL.Buscar(emp, pac);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+            var hcs = result;
+
             foreach (TurnoDTO t in turnos)
             {
                 grd.Rows.Add(
@@ -33,13 +54,25 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void CargarDataGrid(DataGridView grd, EmpleadoDTO emp, PacienteDTO pac, DateTime desde, DateTime hasta)
+        public void CargarDataGrid(DataGridView grd, EmpleadoDTO emp, PacienteDTO pac, DateTime desde, DateTime hasta)
         {
             grd.Rows.Clear();
-            List<TurnoDTO> turnos = new List<TurnoDTO>();
-            turnos = TurnoDAL.BuscarDni(emp, pac.Persona.Dni, desde, hasta);
-            List<HistoriaClinicaDTO> hcs = new List<HistoriaClinicaDTO>();
-            hcs = HistoriaClinicaDAL.Buscar(emp, pac);
+            var (result, message) = turnoDAL.BuscarDni(emp, pac.Persona.Dni, desde, hasta);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+            var turnos = result;
+
+            var (result1, message1) = historiaClinicaDAL.Buscar(emp, pac);
+            if (message1.Contains("Error"))
+                MessageBox.Show(message1,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+            var hcs = result1;
+
             foreach (TurnoDTO t in turnos)
             {
                 grd.Rows.Add(
@@ -54,10 +87,17 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void Guardar(TurnoDTO tur, string desc, string arc)
+        public void Guardar(TurnoDTO tur, string desc, string arc)
         {
             HistoriaClinicaDTO hc = new HistoriaClinicaDTO(tur, desc, arc);
-            if (HistoriaClinicaDAL.Guardar(hc))
+            var (save, message) = historiaClinicaDAL.Guardar(hc);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            if (save)
             {
                 MessageBox.Show(
                     "La Historia Clinica fue guardada correctamente.",
@@ -75,10 +115,17 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void Editar(int id, TurnoDTO tur, string desc, string arc)
+        public void Editar(int id, TurnoDTO tur, string desc, string arc)
         {
             HistoriaClinicaDTO hc = new HistoriaClinicaDTO(id, tur, desc, arc);
-            if (HistoriaClinicaDAL.Editar(hc))
+            var (save, message) = historiaClinicaDAL.Editar(hc);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            if (save)
             {
                 MessageBox.Show(
                     "La Historia Clinica fue modificada correctamente.",

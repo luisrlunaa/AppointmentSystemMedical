@@ -1,10 +1,17 @@
-﻿namespace AppointmentSystemMedical.CapaPresentacion.Administrador
+﻿using AppointmentSystemMedical.CapaLogica;
+using AppointmentSystemMedical.Model.DTOs;
+using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
+
+namespace AppointmentSystemMedical.CapaPresentacion.Administrador
 {
     public partial class frmNuevoCobertura : Form
     {
         private frmPrincipal Padre;
         private int Id;
-
+        Cobertura cobertura = new Cobertura();
+        ObraSocial obraSocial = new ObraSocial();
         public frmNuevoCobertura(frmPrincipal padre)
         {
             InitializeComponent();
@@ -21,11 +28,11 @@
 
         private void frmNuevoCobertura_Load(object sender, EventArgs e)
         {
-            ObraSocial.CargarComboBox(cboObraSocial);
+            obraSocial.CargarComboBox(cboObraSocial);
             if (Id != -1)
             {
                 lblTitulo.Text = "Editar Cobertura";
-                CoberturaDTO cob = Cobertura.Buscar(Id);
+                CoberturaDTO cob = cobertura.Buscar(Id);
                 txtNombre.Text = cob.Descripcion;
                 cboObraSocial.SelectedIndex = cboObraSocial.FindStringExact(cob.ObraSocial.Nombre);
                 chkActivo.Checked = cob.Estado;
@@ -48,11 +55,11 @@
                     KeyValuePair<int, string> seleccionObraSocial = (KeyValuePair<int, string>)cboObraSocial.Items[cboObraSocial.SelectedIndex];
                     if (Id == -1)
                     {
-                        Cobertura.Guardar(seleccionObraSocial.Key, txtNombre.Text, true);
+                        cobertura.Guardar(seleccionObraSocial.Key, txtNombre.Text, true);
                     }
                     else
                     {
-                        Cobertura.Editar(Id, seleccionObraSocial.Key, txtNombre.Text, chkActivo.Checked);
+                        cobertura.Editar(Id, seleccionObraSocial.Key, txtNombre.Text, chkActivo.Checked);
                     }
                     Padre.AbrirFormPanel(new Secretario.frmCoberturas(Padre)); ;
                 }
@@ -86,7 +93,7 @@
             bool camposValidos = true;
             errNuevoCobertura.Clear();
 
-            if (String.IsNullOrWhiteSpace(txtNombre.Text))
+            if (string.IsNullOrWhiteSpace(txtNombre.Text))
             {
                 errNuevoCobertura.SetError(txtNombre, "Debe ingresar una Cobertura");
                 camposValidos = false;

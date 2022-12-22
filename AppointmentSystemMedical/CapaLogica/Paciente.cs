@@ -1,4 +1,5 @@
 ﻿using AppointmentSystemMedical.CapaDatos;
+using AppointmentSystemMedical.Model.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,16 +9,30 @@ namespace AppointmentSystemMedical.CapaLogica
 {
     public class Paciente
     {
-        public static PacienteDTO Buscar(int id)
+        PacienteDAL pacienteDAL = new PacienteDAL();
+        public PacienteDTO Buscar(int id)
         {
-            return PacienteDAL.Buscar(id);
+            var (result, message) = pacienteDAL.Buscar(id);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            return result;
         }
 
-        public static void CargarDataGridBusqueda(DataGridView grd, int dni)
+        public void CargarDataGridBusqueda(DataGridView grd, int dni)
         {
             grd.Rows.Clear();
-            List<PacienteDTO> pacientes = new List<PacienteDTO>();
-            pacientes = PacienteDAL.BuscarDni(dni.ToString());
+            var (result, message) = pacienteDAL.BuscarDni(dni.ToString());
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            var pacientes = result;
             foreach (PacienteDTO pac in pacientes)
             {
                 grd.Rows.Add(
@@ -28,11 +43,17 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void CargarDataGridBusqueda(DataGridView grd, string apenom)
+        public void CargarDataGridBusqueda(DataGridView grd, string apenom)
         {
             grd.Rows.Clear();
-            List<PacienteDTO> pacientes = new List<PacienteDTO>();
-            pacientes = PacienteDAL.BuscarApeNom(apenom);
+            var (result, message) = pacienteDAL.BuscarApeNom(apenom);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            var pacientes = result;
             foreach (PacienteDTO pac in pacientes)
             {
                 grd.Rows.Add(
@@ -43,17 +64,31 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void CargarDataGrid(DataGridView grd, EmpleadoDTO emp)
+        public void CargarDataGrid(DataGridView grd, EmpleadoDTO emp)
         {
             grd.Rows.Clear();
             List<PacienteDTO> pacientes = new List<PacienteDTO>();
             if (emp.TipoUsuario.Descripcion == "Medico")
             {
-                pacientes = PacienteDAL.Buscar(emp);
+                var (result, message) = pacienteDAL.Buscar(emp);
+                if (message.Contains("Error"))
+                    MessageBox.Show(message,
+                                    "Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+
+                pacientes = result;
             }
             else
             {
-                pacientes = PacienteDAL.Buscar();
+                var (result, message) = pacienteDAL.Buscar();
+                if (message.Contains("Error"))
+                    MessageBox.Show(message,
+                                    "Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+
+                pacientes = result;
             }
 
             foreach (PacienteDTO paciente in pacientes)
@@ -72,17 +107,31 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void CargarDataGrid(DataGridView grd, EmpleadoDTO emp, string apenom)
+        public void CargarDataGrid(DataGridView grd, EmpleadoDTO emp, string apenom)
         {
             grd.Rows.Clear();
             List<PacienteDTO> pacientes = new List<PacienteDTO>();
             if (emp.TipoUsuario.Descripcion == "Medico")
             {
-                pacientes = PacienteDAL.BuscarApeNom(emp, apenom);
+                var (result, message) = pacienteDAL.BuscarApeNom(emp, apenom);
+                if (message.Contains("Error"))
+                    MessageBox.Show(message,
+                                    "Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+
+                pacientes = result;
             }
             else
             {
-                pacientes = PacienteDAL.BuscarApeNom(apenom);
+                var (result, message) = pacienteDAL.BuscarApeNom(apenom);
+                if (message.Contains("Error"))
+                    MessageBox.Show(message,
+                                    "Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+
+                pacientes = result;
             }
 
             foreach (PacienteDTO paciente in pacientes)
@@ -101,17 +150,31 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void CargarDataGrid(DataGridView grd, EmpleadoDTO emp, int dni)
+        public void CargarDataGrid(DataGridView grd, EmpleadoDTO emp, int dni)
         {
             grd.Rows.Clear();
             List<PacienteDTO> pacientes = new List<PacienteDTO>();
             if (emp.TipoUsuario.Descripcion == "Medico")
             {
-                pacientes = PacienteDAL.BuscarDni(emp, dni.ToString());
+                var (result, message) = pacienteDAL.BuscarDni(emp, dni.ToString());
+                if (message.Contains("Error"))
+                    MessageBox.Show(message,
+                                    "Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+
+                pacientes = result;
             }
             else
             {
-                pacientes = PacienteDAL.BuscarDni(dni.ToString());
+                var (result, message) = pacienteDAL.BuscarDni(dni.ToString());
+                if (message.Contains("Error"))
+                    MessageBox.Show(message,
+                                    "Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+
+                pacientes = result;
             }
 
             foreach (PacienteDTO paciente in pacientes)
@@ -130,11 +193,19 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void Guardar(string dni, string ape, string nom, DateTime fn,
+        public void Guardar(string dni, string ape, string nom, DateTime fn,
             string sexo, string correo, string tel)
         {
             PacienteDTO nuevo = new PacienteDTO(new PersonaDTO(dni, ape, nom, fn, sexo, correo, tel));
-            if (PacienteDAL.Guardar(nuevo))
+
+            var (save, message) = pacienteDAL.Guardar(nuevo);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            if (save)
             {
                 MessageBox.Show(
                     "El Paciente fue guardado correctamente.",
@@ -152,16 +223,31 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void Editar(int id, string dni, string ape, string nom,
+        public void Editar(int id, string dni, string ape, string nom,
             DateTime fn, string sexo, string correo, string tel)
         {
-            PacienteDTO pac = PacienteDAL.BuscarDni(dni).ElementAt(0);
+            var (result, message1) = pacienteDAL.BuscarDni(dni);
+            if (message1.Contains("Error"))
+                MessageBox.Show(message1,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            var pac = result.FirstOrDefault();
             pac.Persona.Apellidos = ape;
             pac.Persona.Nombres = nom;
             pac.Persona.Sexo = sexo;
             pac.Persona.CorreoElectronico = correo;
             pac.Persona.Telefono = tel;
-            if (PacienteDAL.Editar(pac))
+
+            var (save, message) = pacienteDAL.Editar(pac);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            if (save)
             {
                 MessageBox.Show(
                     "El Paciente fue guardado correctamente.",
@@ -179,7 +265,7 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        private static int CalcularAños(DateTime fecha)
+        private int CalcularAños(DateTime fecha)
         {
             int aux = DateTime.Now.Year - fecha.Year;
             if (DateTime.Now.Month < fecha.Month || (DateTime.Now.Month == fecha.Month && DateTime.Now.Day < fecha.Day))

@@ -1,4 +1,5 @@
-﻿using AppointmentSystemMedical.Model.DTOs;
+﻿using AppointmentSystemMedical.CapaLogica;
+using AppointmentSystemMedical.Model.DTOs;
 using System;
 using System.Windows.Forms;
 
@@ -8,7 +9,7 @@ namespace AppointmentSystemMedical.CapaPresentacion.Administrador
     {
         private frmPrincipal Padre;
         private int Id;
-
+        Especialidad especialidad = new Especialidad();
         public frmNuevoEspecialidad(frmPrincipal padre)
         {
             InitializeComponent();
@@ -28,7 +29,7 @@ namespace AppointmentSystemMedical.CapaPresentacion.Administrador
             if (Id != -1)
             {
                 lblTitulo.Text = "Editar Especialidad";
-                EspecialidadDTO esp = Especialidad.Buscar(Id);
+                EspecialidadDTO esp = especialidad.Buscar(Id);
                 txtNombre.Text = esp.Descripcion;
             }
         }
@@ -47,11 +48,11 @@ namespace AppointmentSystemMedical.CapaPresentacion.Administrador
                 {
                     if (Id == -1)
                     {
-                        Especialidad.Guardar(txtNombre.Text);
+                        especialidad.Guardar(txtNombre.Text);
                     }
                     else
                     {
-                        Especialidad.Editar(Id, txtNombre.Text);
+                        especialidad.Editar(Id, txtNombre.Text);
                     }
                     Padre.AbrirFormPanel(new Secretario.frmEspecialidades(Padre));
                 }

@@ -11,7 +11,8 @@ namespace AppointmentSystemMedical.CapaPresentacion.SuperAdministrador
     {
         private frmPrincipal Padre;
         private int Id;
-
+        CapaLogica.Empleado empleado = new CapaLogica.Empleado();
+        CapaLogica.TipoUsuario tipoUsuario = new CapaLogica.TipoUsuario();
         public frmNuevoEmpleado(frmPrincipal padre)
         {
             InitializeComponent();
@@ -29,13 +30,13 @@ namespace AppointmentSystemMedical.CapaPresentacion.SuperAdministrador
 
         private void frmNuevoMedico_Load(object sender, EventArgs e)
         {
-            CapaLogica.TipoUsuario.CargarComboBox(cboTipoUsuario);
-            if (Id != -1)
+            tipoUsuario.CargarComboBox(cboTipoUsuario);
+            if (Id != -1 && Id != 0)
             {
                 lblTitulo.Text = "Editar Empleado";
                 lblTitulo0.Text = "Editar Empleado";
 
-                EmpleadoDTO emp = CapaLogica.Empleado.BuscarDni(txtDni.Text);
+                EmpleadoDTO emp = empleado.BuscarDni(txtDni.Text);
                 Id = emp.Id;
                 txtApellidos.Text = emp.Persona.Apellidos;
                 txtNombres.Text = emp.Persona.Nombres;
@@ -79,7 +80,7 @@ namespace AppointmentSystemMedical.CapaPresentacion.SuperAdministrador
                     KeyValuePair<int, string> seleccionTipo = (KeyValuePair<int, string>)cboTipoUsuario.Items[cboTipoUsuario.SelectedIndex];
                     if (Id == -1)
                     {
-                        CapaLogica.Empleado.Guardar(
+                        empleado.Guardar(
                             txtDni.Text, txtApellidos.Text, txtNombres.Text, dtpFechaNacimiento.Value,
                             (rdbMasculino.Checked) ? "M" : "F", txtCorreoElectronico.Text, txtTelefono.Text,
                             txtCuil.Text, txtUsuario.Text, txtContraseña.Text, dtpFechaIngreso.Value,
@@ -87,14 +88,14 @@ namespace AppointmentSystemMedical.CapaPresentacion.SuperAdministrador
                     }
                     else
                     {
-                        CapaLogica.Empleado.Editar(
+                        empleado.Editar(
                             Id, txtDni.Text, txtApellidos.Text, txtNombres.Text, dtpFechaNacimiento.Value,
                             (rdbMasculino.Checked) ? "M" : "F", txtCorreoElectronico.Text, txtTelefono.Text,
                             txtCuil.Text, txtUsuario.Text, txtContraseña.Text, dtpFechaIngreso.Value,
                             seleccionTipo.Key, chkActivo.Checked);
                         if (Padre.Sesion.Persona.Dni == txtDni.Text)
                         {
-                            Padre.Sesion = CapaLogica.Empleado.BuscarDni(txtDni.Text);
+                            Padre.Sesion = empleado.BuscarDni(txtDni.Text);
                             Padre.AdministrarPermisos();
                         }
                     }

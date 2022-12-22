@@ -1,4 +1,5 @@
 ﻿using AppointmentSystemMedical.CapaDatos;
+using AppointmentSystemMedical.Model.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
@@ -7,16 +8,31 @@ namespace AppointmentSystemMedical.CapaLogica
 {
     public class Especialidad
     {
-        public static EspecialidadDTO Buscar(int id)
+        EspecialidadDAL especialidadDAL = new EspecialidadDAL();
+        public EspecialidadDTO Buscar(int id)
         {
-            return EspecialidadDAL.Buscar(id);
+            var (result, message) = especialidadDAL.Buscar(id);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            return result;
         }
 
-        public static void CargarComboBox(ComboBox cb)
+        public void CargarComboBox(ComboBox cb)
         {
             int ancho = 0;
             int maximo = 0;
-            foreach (EspecialidadDTO temp in EspecialidadDAL.Buscar())
+            var (result, message) = especialidadDAL.Buscar();
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            foreach (EspecialidadDTO temp in result)
             {
                 // calculo en ancho mas largo de texto
                 ancho = TextRenderer.MeasureText(temp.Descripcion, cb.Font).Width;
@@ -32,11 +48,17 @@ namespace AppointmentSystemMedical.CapaLogica
             cb.DropDownWidth = maximo;
         }
 
-        public static void CargarDataGrid(DataGridView grd)
+        public void CargarDataGrid(DataGridView grd)
         {
             grd.Rows.Clear();
-            List<EspecialidadDTO> especialidades = new List<EspecialidadDTO>();
-            especialidades = EspecialidadDAL.Buscar();
+            var (result, message) = especialidadDAL.Buscar();
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            var especialidades = result;
             foreach (EspecialidadDTO temp in especialidades)
             {
                 grd.Rows.Add(
@@ -46,11 +68,17 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void CargarDataGrid(DataGridView grd, string apenom)
+        public void CargarDataGrid(DataGridView grd, string apenom)
         {
             grd.Rows.Clear();
-            List<EspecialidadDTO> especialidades = new List<EspecialidadDTO>();
-            especialidades = EspecialidadDAL.Buscar(apenom);
+            var (result, message) = especialidadDAL.Buscar(apenom);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            var especialidades = result;
             foreach (EspecialidadDTO temp in especialidades)
             {
                 grd.Rows.Add(
@@ -60,10 +88,17 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void Guardar(string desc)
+        public void Guardar(string desc)
         {
             EspecialidadDTO nuevo = new EspecialidadDTO(desc);
-            if (EspecialidadDAL.Guardar(nuevo))
+            var (save, message) = especialidadDAL.Guardar(nuevo);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            if (save)
             {
                 MessageBox.Show(
                     "La Especialidad fue guardada correctamente.",
@@ -81,10 +116,17 @@ namespace AppointmentSystemMedical.CapaLogica
             }
         }
 
-        public static void Editar(int id, string desc)
+        public void Editar(int id, string desc)
         {
             EspecialidadDTO nuevo = new EspecialidadDTO(id, desc);
-            if (EspecialidadDAL.Editar(nuevo))
+            var (save, message) = especialidadDAL.Editar(nuevo);
+            if (message.Contains("Error"))
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            if (save)
             {
                 MessageBox.Show(
                     "La Especialidad fue modificada correctamente.",

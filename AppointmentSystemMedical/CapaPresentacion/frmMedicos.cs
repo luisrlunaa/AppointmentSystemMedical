@@ -7,7 +7,7 @@ namespace AppointmentSystemMedical.CapaPresentacion
     public partial class frmMedicos : Form
     {
         private frmPrincipal Padre;
-
+        CapaLogica.Medico medico = new CapaLogica.Medico();
         public frmMedicos(frmPrincipal padre)
         {
             InitializeComponent();
@@ -17,7 +17,7 @@ namespace AppointmentSystemMedical.CapaPresentacion
         private void frmMedicos_Load(object sender, EventArgs e)
         {
             AdministrarPermisos();
-            CapaLogica.Medico.CargarDataGrid(grdMedicos);
+            medico.CargarDataGrid(grdMedicos);
         }
 
         private void txtBuscar_Enter(object sender, EventArgs e)
@@ -109,15 +109,15 @@ namespace AppointmentSystemMedical.CapaPresentacion
             int dni;
             if (txtBuscar.Text == "")
             {
-                CapaLogica.Medico.CargarDataGrid(grdMedicos);
+                medico.CargarDataGrid(grdMedicos);
             }
-            else if (Int32.TryParse(txtBuscar.Text, out dni))
+            else if (int.TryParse(txtBuscar.Text, out dni))
             {
-                CapaLogica.Medico.CargarDataGrid(grdMedicos, dni);
+                medico.CargarDataGrid(grdMedicos, dni);
             }
             else
             {
-                CapaLogica.Medico.CargarDataGrid(grdMedicos, txtBuscar.Text);
+                medico.CargarDataGrid(grdMedicos, txtBuscar.Text);
             }
         }
     }

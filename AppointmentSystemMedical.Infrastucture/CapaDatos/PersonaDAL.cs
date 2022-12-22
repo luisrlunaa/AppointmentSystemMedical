@@ -19,12 +19,11 @@ namespace AppointmentSystemMedical.CapaDatos
                 if (id <= 0)
                     return (s, "Error Input Invalido, Metodo PersonaDAL.BuscarById");
 
-                var classKeys = Data.GetObjectKeys(new Persona());
+                var classKeys = Data.GetObjectKeys(new Persona()).Where(x => x != "Empleado" && x != "Paciente").ToList();
                 var sql = Data.SelectExpression("Persona", classKeys, WhereExpresion: " WHERE Persona.PersonaId ='" + id + "'");
                 var (dr, message1) = Data.GetOne(sql, "PersonaDAL.BuscarById");
                 if (dr is null)
                     return (s, message1);
-
 
                 s.Id = dr["PersonaId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("PersonaId")) : 0;
                 s.Dni = dr["Dni"].GetType() != typeof(DBNull) ? dr.GetString(dr.GetOrdinal("Dni")) : string.Empty;
@@ -48,7 +47,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<PersonaDTO> res = new List<PersonaDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new Persona());
+                var classKeys = Data.GetObjectKeys(new Persona()).Where(x => x != "Empleado" && x != "Paciente").ToList();
                 var sql = Data.SelectExpression("Persona", classKeys, WhereExpresion: "Where Persona.Dni = '" + dni + "'");
                 var (dtPC, message) = Data.GetList(sql, "PersonaDAL.BuscarDni");
                 if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
@@ -94,7 +93,7 @@ namespace AppointmentSystemMedical.CapaDatos
                 var parameters = new List<string> {  "'" + input.Dni + "'", "'" + input.Apellidos + "'", "'" + input.Nombres + "'",
                     "'" + input.FechaNacimiento.ToShortDateString() + "'", "'" + input.Sexo + "'", "'" + input.CorreoElectronico + "'",
                     "'" + input.Telefono + "'" };
-                var classKeys = Data.GetObjectKeys(new Persona()).Where(x => x != "PersonaId").ToList();
+                var classKeys = Data.GetObjectKeys(new Persona()).Where(x => x != "PersonaId" && x != "Empleado" && x != "Paciente").ToList();
                 var sql = Data.InsertExpression("Persona", classKeys, parameters);
                 var (response, message) = Data.CrudAction(sql, "PersonaDAL.Guardar");
                 if (!response)
@@ -117,7 +116,7 @@ namespace AppointmentSystemMedical.CapaDatos
 
                 var parameters = new List<string> { "'" + input.Apellidos + "'", "'" + input.Nombres + "'", "'" + input.FechaNacimiento.ToShortDateString() + "'",
                     "'" + input.Sexo + "'", "'" + input.CorreoElectronico + "'", "'" + input.Telefono + "'" };
-                var classKeys = Data.GetObjectKeys(new Persona()).Where(x => x != "PersonaId" && x != "Dni").ToList();
+                var classKeys = Data.GetObjectKeys(new Persona()).Where(x => x != "PersonaId" && x != "Dni" && x != "Empleado" && x != "Paciente").ToList();
                 var sql = Data.UpdateExpression("ObraSocial", classKeys, parameters, " WHERE Dni = '" + input.Dni + "'");
                 var (response, message) = Data.CrudAction(sql, "PersonaDAL.Editar");
                 if (!response)

@@ -21,7 +21,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<TurnoDTO> res = new List<TurnoDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new Turno());
+                var classKeys = Data.GetObjectKeys(new Turno()).Where(x => x != "Cobertura" && x != "HistoriaClinica" && x != "Medico" && x != "Paciente" && x != "TurnoEstado").ToList();
                 var sql = Data.SelectExpression("Turno", classKeys, OrderBy: "FechaHora");
                 var (dtPC, message) = Data.GetList(sql, "TurnoDAL.Buscar");
                 if (dtPC is null || dtPC.Rows is null || dtPC.Rows.Count == 0)
@@ -32,8 +32,11 @@ namespace AppointmentSystemMedical.CapaDatos
                     var s = new TurnoDTO();
                     s.Id = temp["TurnoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["TurnoId"]);
                     s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
-
                     var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+
                     if (idm > 0)
                     {
                         var medico = medicoDAL.Buscar(idm);
@@ -41,7 +44,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Medico = medico.result;
                     }
 
-                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
                     if (idc > 0)
                     {
                         var cobertura = coberturaDAL.Buscar(idc);
@@ -49,7 +51,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Cobertura = cobertura.result;
                     }
 
-                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
                     if (idp > 0)
                     {
                         var paciente = pacienteDAL.Buscar(idp);
@@ -57,7 +58,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Paciente = paciente.result;
                     }
 
-                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
                     if (ide > 0)
                     {
                         var estado = turnoEstadoDAL.Buscar(ide);
@@ -84,7 +84,7 @@ namespace AppointmentSystemMedical.CapaDatos
                 if (id <= 0)
                     return (s, "Error Input Invalido, Metodo EspecialidadDAL.BuscarById");
 
-                var classKeys = Data.GetObjectKeys(new Turno());
+                var classKeys = Data.GetObjectKeys(new Turno()).Where(x => x != "Cobertura" && x != "HistoriaClinica" && x != "Medico" && x != "Paciente" && x != "TurnoEstado").ToList();
                 var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE TurnoId ='" + id + "'");
                 var (dr, message1) = Data.GetOne(sql, "TurnoDAL.BuscarById");
                 if (dr is null)
@@ -94,6 +94,10 @@ namespace AppointmentSystemMedical.CapaDatos
                 s.FechaHora = dr["FechaHora"].GetType() != typeof(DBNull) ? dr.GetDateTime(dr.GetOrdinal("FechaHora")) : DateTime.MinValue;
 
                 var idm = dr["MedicoId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("MedicoId")) : 0;
+                var idc = dr["CoberturaId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("CoberturaId")) : 0;
+                var idp = dr["CoberturaId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("CoberturaId")) : 0;
+                var ide = dr["EstadoId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("EstadoId")) : 0;
+
                 if (idm > 0)
                 {
                     var medico = medicoDAL.Buscar(idm);
@@ -101,7 +105,6 @@ namespace AppointmentSystemMedical.CapaDatos
                         s.Medico = medico.result;
                 }
 
-                var idc = dr["CoberturaId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("CoberturaId")) : 0;
                 if (idc > 0)
                 {
                     var cobertura = coberturaDAL.Buscar(idc);
@@ -109,7 +112,6 @@ namespace AppointmentSystemMedical.CapaDatos
                         s.Cobertura = cobertura.result;
                 }
 
-                var idp = dr["CoberturaId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("CoberturaId")) : 0;
                 if (idp > 0)
                 {
                     var paciente = pacienteDAL.Buscar(idp);
@@ -117,7 +119,6 @@ namespace AppointmentSystemMedical.CapaDatos
                         s.Paciente = paciente.result;
                 }
 
-                var ide = dr["EstadoId"].GetType() != typeof(DBNull) ? dr.GetInt32(dr.GetOrdinal("EstadoId")) : 0;
                 if (ide > 0)
                 {
                     var estado = turnoEstadoDAL.Buscar(ide);
@@ -138,7 +139,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<TurnoDTO> res = new List<TurnoDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new Turno());
+                var classKeys = Data.GetObjectKeys(new Turno()).Where(x => x != "Cobertura" && x != "HistoriaClinica" && x != "Medico" && x != "Paciente" && x != "TurnoEstado").ToList();
                 var join = Data.JoinExpression("INNER", new List<string>() { "Turno" }, new List<string>() { "Medico" }, new List<string>() { "MedicoId" });
                 var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE FechaHora BETWEEN '" + desde + "' AND '" + hasta + "'", OrderBy: "FechaHora");
                 var (dtPC, message) = Data.GetList(sql, "TurnoDAL.BuscarByEmpleadoId");
@@ -152,6 +153,10 @@ namespace AppointmentSystemMedical.CapaDatos
                     s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
 
                     var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+
                     if (idm > 0)
                     {
                         var medico = medicoDAL.Buscar(idm);
@@ -159,7 +164,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Medico = medico.result;
                     }
 
-                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
                     if (idc > 0)
                     {
                         var cobertura = coberturaDAL.Buscar(idc);
@@ -167,7 +171,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Cobertura = cobertura.result;
                     }
 
-                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
                     if (idp > 0)
                     {
                         var paciente = pacienteDAL.Buscar(idp);
@@ -175,7 +178,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Paciente = paciente.result;
                     }
 
-                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
                     if (ide > 0)
                     {
                         var estado = turnoEstadoDAL.Buscar(ide);
@@ -199,7 +201,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<TurnoDTO> res = new List<TurnoDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new Turno());
+                var classKeys = Data.GetObjectKeys(new Turno()).Where(x => x != "Cobertura" && x != "HistoriaClinica" && x != "Medico" && x != "Paciente" && x != "TurnoEstado").ToList();
                 var join = Data.JoinExpression("INNER", new List<string>() { "Turno" }, new List<string>() { "Medico" }, new List<string>() { "MedicoId" });
                 var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE Medico.EmpleadoId ='" + med.Id + "'", OrderBy: "FechaHora");
                 var (dtPC, message) = Data.GetList(sql, "TurnoDAL.BuscarByEmpleadoId");
@@ -213,6 +215,10 @@ namespace AppointmentSystemMedical.CapaDatos
                     s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
 
                     var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+
                     if (idm > 0)
                     {
                         var medico = medicoDAL.Buscar(idm);
@@ -220,7 +226,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Medico = medico.result;
                     }
 
-                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
                     if (idc > 0)
                     {
                         var cobertura = coberturaDAL.Buscar(idc);
@@ -228,7 +233,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Cobertura = cobertura.result;
                     }
 
-                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
                     if (idp > 0)
                     {
                         var paciente = pacienteDAL.Buscar(idp);
@@ -236,7 +240,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Paciente = paciente.result;
                     }
 
-                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
                     if (ide > 0)
                     {
                         var estado = turnoEstadoDAL.Buscar(ide);
@@ -260,7 +263,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<TurnoDTO> res = new List<TurnoDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new Turno());
+                var classKeys = Data.GetObjectKeys(new Turno()).Where(x => x != "Cobertura" && x != "HistoriaClinica" && x != "Medico" && x != "Paciente" && x != "TurnoEstado").ToList();
                 var join = Data.JoinExpression("INNER", new List<string>() { "Turno" }, new List<string>() { "Medico" }, new List<string>() { "MedicoId" });
                 var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE Medico.EmpleadoId ='" + med.Id + "' AND FechaHora BETWEEN '" + desde + "' AND '" + hasta + "'", OrderBy: "FechaHora");
                 var (dtPC, message) = Data.GetList(sql, "TurnoDAL.BuscarByEmpleadoId");
@@ -274,6 +277,10 @@ namespace AppointmentSystemMedical.CapaDatos
                     s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
 
                     var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+
                     if (idm > 0)
                     {
                         var medico = medicoDAL.Buscar(idm);
@@ -281,7 +288,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Medico = medico.result;
                     }
 
-                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
                     if (idc > 0)
                     {
                         var cobertura = coberturaDAL.Buscar(idc);
@@ -289,7 +295,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Cobertura = cobertura.result;
                     }
 
-                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
                     if (idp > 0)
                     {
                         var paciente = pacienteDAL.Buscar(idp);
@@ -297,7 +302,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Paciente = paciente.result;
                     }
 
-                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
                     if (ide > 0)
                     {
                         var estado = turnoEstadoDAL.Buscar(ide);
@@ -321,7 +325,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<TurnoDTO> res = new List<TurnoDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new Turno());
+                var classKeys = Data.GetObjectKeys(new Turno()).Where(x => x != "Cobertura" && x != "HistoriaClinica" && x != "Medico" && x != "Paciente" && x != "TurnoEstado").ToList();
                 var join = Data.JoinExpression("INNER", new List<string>() { "Turno", "Empleado", "Persona" }, new List<string>() { "Medico", "Persona", "Paciente" }, new List<string>() { "MedicoId", "PersonaId", "PersonaId" });
                 var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE MedicoId = '" + med.Id + "' AND FechaHora = '" + dia.ToShortDateString() + "'", OrderBy: "FechaHora");
                 var (dtPC, message) = Data.GetList(sql, "TurnoDAL.BuscarByEmpleadoId");
@@ -335,6 +339,10 @@ namespace AppointmentSystemMedical.CapaDatos
                     s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
 
                     var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+
                     if (idm > 0)
                     {
                         var medico = medicoDAL.Buscar(idm);
@@ -342,7 +350,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Medico = medico.result;
                     }
 
-                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
                     if (idc > 0)
                     {
                         var cobertura = coberturaDAL.Buscar(idc);
@@ -350,7 +357,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Cobertura = cobertura.result;
                     }
 
-                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
                     if (idp > 0)
                     {
                         var paciente = pacienteDAL.Buscar(idp);
@@ -358,7 +364,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Paciente = paciente.result;
                     }
 
-                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
                     if (ide > 0)
                     {
                         var estado = turnoEstadoDAL.Buscar(ide);
@@ -382,7 +387,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<TurnoDTO> res = new List<TurnoDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new Turno());
+                var classKeys = Data.GetObjectKeys(new Turno()).Where(x => x != "Cobertura" && x != "HistoriaClinica" && x != "Medico" && x != "Paciente" && x != "TurnoEstado").ToList();
                 var join = Data.JoinExpression("INNER", new List<string>() { "Turno", "Empleado", "Persona" }, new List<string>() { "Medico", "Persona", "Paciente" }, new List<string>() { "MedicoId", "PersonaId", "PersonaId" });
                 var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE Medico.Empleado.Persona.Apellidos LIKE '%" + apenom + "%'"
                     + "OR Medico.Empleado.Persona.Nombres LIKE '%" + apenom + "%' OR Paciente.Persona.Apellidos LIKE '%" + apenom
@@ -398,6 +403,10 @@ namespace AppointmentSystemMedical.CapaDatos
                     s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
 
                     var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+
                     if (idm > 0)
                     {
                         var medico = medicoDAL.Buscar(idm);
@@ -405,7 +414,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Medico = medico.result;
                     }
 
-                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
                     if (idc > 0)
                     {
                         var cobertura = coberturaDAL.Buscar(idc);
@@ -413,7 +421,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Cobertura = cobertura.result;
                     }
 
-                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
                     if (idp > 0)
                     {
                         var paciente = pacienteDAL.Buscar(idp);
@@ -421,7 +428,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Paciente = paciente.result;
                     }
 
-                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
                     if (ide > 0)
                     {
                         var estado = turnoEstadoDAL.Buscar(ide);
@@ -445,7 +451,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<TurnoDTO> res = new List<TurnoDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new Turno());
+                var classKeys = Data.GetObjectKeys(new Turno()).Where(x => x != "Cobertura" && x != "HistoriaClinica" && x != "Medico" && x != "Paciente" && x != "TurnoEstado").ToList();
                 var join = Data.JoinExpression("INNER", new List<string>() { "Turno", "Empleado", "Persona" }, new List<string>() { "Medico", "Persona", "Paciente" }, new List<string>() { "MedicoId", "PersonaId", "PersonaId" });
                 var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE Medico.Empleado.Persona.Apellidos LIKE '%" + apenom + "%'"
                     + "OR Medico.Empleado.Persona.Nombres LIKE '%" + apenom + "%' OR Paciente.Persona.Apellidos LIKE '%" + apenom
@@ -461,6 +467,10 @@ namespace AppointmentSystemMedical.CapaDatos
                     s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
 
                     var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+
                     if (idm > 0)
                     {
                         var medico = medicoDAL.Buscar(idm);
@@ -468,7 +478,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Medico = medico.result;
                     }
 
-                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
                     if (idc > 0)
                     {
                         var cobertura = coberturaDAL.Buscar(idc);
@@ -476,7 +485,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Cobertura = cobertura.result;
                     }
 
-                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
                     if (idp > 0)
                     {
                         var paciente = pacienteDAL.Buscar(idp);
@@ -484,7 +492,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Paciente = paciente.result;
                     }
 
-                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
                     if (ide > 0)
                     {
                         var estado = turnoEstadoDAL.Buscar(ide);
@@ -508,7 +515,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<TurnoDTO> res = new List<TurnoDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new Turno());
+                var classKeys = Data.GetObjectKeys(new Turno()).Where(x => x != "Cobertura" && x != "HistoriaClinica" && x != "Medico" && x != "Paciente" && x != "TurnoEstado").ToList();
                 var join = Data.JoinExpression("INNER", new List<string>() { "Turno", "Empleado", "Persona" }, new List<string>() { "Medico", "Persona", "Paciente" }, new List<string>() { "MedicoId", "PersonaId", "PersonaId" });
                 var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE Medico.EmpleadoId = " + med.Id + "OR Paciente.Persona.Apellidos LIKE '%" + apenom + "%' OR Paciente.Persona.Nombres LIKE '%" + apenom + "%'", OrderBy: "FechaHora");
                 var (dtPC, message) = Data.GetList(sql, "TurnoDAL.BuscarByEmpleadoId");
@@ -522,6 +529,10 @@ namespace AppointmentSystemMedical.CapaDatos
                     s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
 
                     var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+
                     if (idm > 0)
                     {
                         var medico = medicoDAL.Buscar(idm);
@@ -529,7 +540,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Medico = medico.result;
                     }
 
-                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
                     if (idc > 0)
                     {
                         var cobertura = coberturaDAL.Buscar(idc);
@@ -537,7 +547,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Cobertura = cobertura.result;
                     }
 
-                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
                     if (idp > 0)
                     {
                         var paciente = pacienteDAL.Buscar(idp);
@@ -545,7 +554,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Paciente = paciente.result;
                     }
 
-                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
                     if (ide > 0)
                     {
                         var estado = turnoEstadoDAL.Buscar(ide);
@@ -569,7 +577,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<TurnoDTO> res = new List<TurnoDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new Turno());
+                var classKeys = Data.GetObjectKeys(new Turno()).Where(x => x != "Cobertura" && x != "HistoriaClinica" && x != "Medico" && x != "Paciente" && x != "TurnoEstado").ToList();
                 var join = Data.JoinExpression("INNER", new List<string>() { "Turno", "Empleado", "Persona" }, new List<string>() { "Medico", "Persona", "Paciente" }, new List<string>() { "MedicoId", "PersonaId", "PersonaId" });
                 var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE Medico.EmpleadoId = " + med.Id + " AND Medico.Empleado.Persona.Apellidos LIKE '%" + apenom + "%'"
                     + "OR Medico.Empleado.Persona.Nombres LIKE '%" + apenom + "%' OR Paciente.Persona.Apellidos LIKE '%" + apenom
@@ -585,6 +593,10 @@ namespace AppointmentSystemMedical.CapaDatos
                     s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
 
                     var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+
                     if (idm > 0)
                     {
                         var medico = medicoDAL.Buscar(idm);
@@ -592,7 +604,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Medico = medico.result;
                     }
 
-                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
                     if (idc > 0)
                     {
                         var cobertura = coberturaDAL.Buscar(idc);
@@ -600,7 +611,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Cobertura = cobertura.result;
                     }
 
-                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
                     if (idp > 0)
                     {
                         var paciente = pacienteDAL.Buscar(idp);
@@ -608,7 +618,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Paciente = paciente.result;
                     }
 
-                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
                     if (ide > 0)
                     {
                         var estado = turnoEstadoDAL.Buscar(ide);
@@ -632,7 +641,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<TurnoDTO> res = new List<TurnoDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new Turno());
+                var classKeys = Data.GetObjectKeys(new Turno()).Where(x => x != "Cobertura" && x != "HistoriaClinica" && x != "Medico" && x != "Paciente" && x != "TurnoEstado").ToList();
                 var join = Data.JoinExpression("INNER", new List<string>() { "Turno", "Empleado", "Persona" }, new List<string>() { "Medico", "Persona", "Paciente" }, new List<string>() { "MedicoId", "PersonaId", "PersonaId" });
                 var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE Medico.Empleado.Persona.Dni LIKE '%" + dni + "%'"
                     + "OR Paciente.Persona.Dni LIKE '%" + dni + "%'", OrderBy: "FechaHora");
@@ -647,6 +656,10 @@ namespace AppointmentSystemMedical.CapaDatos
                     s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
 
                     var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+
                     if (idm > 0)
                     {
                         var medico = medicoDAL.Buscar(idm);
@@ -654,7 +667,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Medico = medico.result;
                     }
 
-                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
                     if (idc > 0)
                     {
                         var cobertura = coberturaDAL.Buscar(idc);
@@ -662,7 +674,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Cobertura = cobertura.result;
                     }
 
-                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
                     if (idp > 0)
                     {
                         var paciente = pacienteDAL.Buscar(idp);
@@ -670,7 +681,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Paciente = paciente.result;
                     }
 
-                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
                     if (ide > 0)
                     {
                         var estado = turnoEstadoDAL.Buscar(ide);
@@ -694,7 +704,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<TurnoDTO> res = new List<TurnoDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new Turno());
+                var classKeys = Data.GetObjectKeys(new Turno()).Where(x => x != "Cobertura" && x != "HistoriaClinica" && x != "Medico" && x != "Paciente" && x != "TurnoEstado").ToList();
                 var join = Data.JoinExpression("INNER", new List<string>() { "Turno", "Empleado", "Persona" }, new List<string>() { "Medico", "Persona", "Paciente" }, new List<string>() { "MedicoId", "PersonaId", "PersonaId" });
                 var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE Medico.Empleado.Persona.Dni LIKE '%" + dni + "%'"
                     + "OR Paciente.Persona.Dni LIKE '%" + dni + "%' AND FechaHora BETWEEN '" + desde + "' AND '" + hasta + "'", OrderBy: "FechaHora");
@@ -709,6 +719,10 @@ namespace AppointmentSystemMedical.CapaDatos
                     s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
 
                     var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+
                     if (idm > 0)
                     {
                         var medico = medicoDAL.Buscar(idm);
@@ -716,7 +730,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Medico = medico.result;
                     }
 
-                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
                     if (idc > 0)
                     {
                         var cobertura = coberturaDAL.Buscar(idc);
@@ -724,7 +737,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Cobertura = cobertura.result;
                     }
 
-                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
                     if (idp > 0)
                     {
                         var paciente = pacienteDAL.Buscar(idp);
@@ -732,7 +744,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Paciente = paciente.result;
                     }
 
-                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
                     if (ide > 0)
                     {
                         var estado = turnoEstadoDAL.Buscar(ide);
@@ -756,7 +767,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<TurnoDTO> res = new List<TurnoDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new Turno());
+                var classKeys = Data.GetObjectKeys(new Turno()).Where(x => x != "Cobertura" && x != "HistoriaClinica" && x != "Medico" && x != "Paciente" && x != "TurnoEstado").ToList();
                 var join = Data.JoinExpression("INNER", new List<string>() { "Turno", "Empleado", "Persona" }, new List<string>() { "Medico", "Persona", "Paciente" }, new List<string>() { "MedicoId", "PersonaId", "PersonaId" });
                 var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE Medico.EmpleadoId = '" + med.Id + "' AND Medico.Empleado.Persona.Dni LIKE '%" + dni + "%'"
                     + "OR Paciente.Persona.Dni LIKE '%" + dni + "%'", OrderBy: "FechaHora");
@@ -771,6 +782,10 @@ namespace AppointmentSystemMedical.CapaDatos
                     s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
 
                     var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+
                     if (idm > 0)
                     {
                         var medico = medicoDAL.Buscar(idm);
@@ -778,7 +793,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Medico = medico.result;
                     }
 
-                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
                     if (idc > 0)
                     {
                         var cobertura = coberturaDAL.Buscar(idc);
@@ -786,7 +800,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Cobertura = cobertura.result;
                     }
 
-                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
                     if (idp > 0)
                     {
                         var paciente = pacienteDAL.Buscar(idp);
@@ -794,7 +807,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Paciente = paciente.result;
                     }
 
-                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
                     if (ide > 0)
                     {
                         var estado = turnoEstadoDAL.Buscar(ide);
@@ -818,7 +830,7 @@ namespace AppointmentSystemMedical.CapaDatos
             List<TurnoDTO> res = new List<TurnoDTO>();
             try
             {
-                var classKeys = Data.GetObjectKeys(new Turno());
+                var classKeys = Data.GetObjectKeys(new Turno()).Where(x => x != "Cobertura" && x != "HistoriaClinica" && x != "Medico" && x != "Paciente" && x != "TurnoEstado").ToList();
                 var join = Data.JoinExpression("INNER", new List<string>() { "Turno", "Empleado", "Persona" }, new List<string>() { "Medico", "Persona", "Paciente" }, new List<string>() { "MedicoId", "PersonaId", "PersonaId" });
                 var sql = Data.SelectExpression("Turno", classKeys, WhereExpresion: " WHERE Medico.EmpleadoId = '" + med.Id + "' AND Medico.Empleado.Persona.Dni LIKE '%" + dni + "%'"
                     + "OR Paciente.Persona.Dni LIKE '%" + dni + "%' AND FechaHora BETWEEN '" + desde + "' AND '" + hasta + "'", OrderBy: "FechaHora");
@@ -833,6 +845,10 @@ namespace AppointmentSystemMedical.CapaDatos
                     s.FechaHora = temp["FechaHora"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(temp["FechaHora"]);
 
                     var idm = temp["MedicoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["MedicoId"]);
+                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
+                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
+                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
+
                     if (idm > 0)
                     {
                         var medico = medicoDAL.Buscar(idm);
@@ -840,7 +856,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Medico = medico.result;
                     }
 
-                    var idc = temp["CoberturaId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["CoberturaId"]);
                     if (idc > 0)
                     {
                         var cobertura = coberturaDAL.Buscar(idc);
@@ -848,7 +863,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Cobertura = cobertura.result;
                     }
 
-                    var idp = temp["PacienteId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["PacienteId"]);
                     if (idp > 0)
                     {
                         var paciente = pacienteDAL.Buscar(idp);
@@ -856,7 +870,6 @@ namespace AppointmentSystemMedical.CapaDatos
                             s.Paciente = paciente.result;
                     }
 
-                    var ide = temp["EstadoId"] == DBNull.Value ? 0 : Convert.ToInt32(temp["EstadoId"]);
                     if (ide > 0)
                     {
                         var estado = turnoEstadoDAL.Buscar(ide);
@@ -883,7 +896,7 @@ namespace AppointmentSystemMedical.CapaDatos
                     return (false, "Error Input Invalido, Metodo TurnoDAL.Guardar");
 
                 var parameters = new List<string> { "'" + input.Paciente.Id + "'", "'" + input.Cobertura.Id + "'", "'" + input.Estado.Id + "'", "'" + input.FechaHora.ToShortDateString() + "'" };
-                var classKeys = Data.GetObjectKeys(new Turno()).Where(x => x != "TurnoId").ToList();
+                var classKeys = Data.GetObjectKeys(new Turno()).Where(x => x != "TurnoId" && x != "Cobertura" && x != "HistoriaClinica" && x != "Medico" && x != "Paciente" && x != "TurnoEstado").ToList();
                 var sql = Data.InsertExpression("Turno", classKeys, parameters);
                 var (response, message) = Data.CrudAction(sql, "TurnoDAL.Guardar");
                 if (!response)
@@ -905,7 +918,7 @@ namespace AppointmentSystemMedical.CapaDatos
                     return (false, "Error Input Invalido, Metodo TurnoDAL.Editar");
 
                 var parameters = new List<string> { "'" + input.Paciente.Id + "'", "'" + input.Cobertura.Id + "'", "'" + input.Estado.Id + "'", "'" + input.FechaHora.ToShortDateString() + "'" };
-                var classKeys = Data.GetObjectKeys(new Turno()).Where(x => x != "TurnoId").ToList();
+                var classKeys = Data.GetObjectKeys(new Turno()).Where(x => x != "TurnoId" && x != "Cobertura" && x != "HistoriaClinica" && x != "Medico" && x != "Paciente" && x != "TurnoEstado").ToList();
                 var sql = Data.UpdateExpression("Turno", classKeys, parameters, " WHERE TurnoId = '" + input.Id + "'");
                 var (response, message) = Data.CrudAction(sql, "TurnoDAL.Editar");
                 if (!response)

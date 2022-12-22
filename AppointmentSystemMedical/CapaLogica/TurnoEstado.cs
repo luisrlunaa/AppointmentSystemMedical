@@ -7,13 +7,17 @@ namespace AppointmentSystemMedical.CapaLogica
 {
     public class TurnoEstado
     {
-        public static void CargarComboBox(ComboBox cb)
+        TurnoEstadoDAL turnoEstadoDAL = new TurnoEstadoDAL();
+        public void CargarComboBox(ComboBox cb)
         {
             int ancho = 0;
             int maximo = 0;
-            var (list, message) = TurnoEstadoDAL.Buscar();
+            var (list, message) = turnoEstadoDAL.Buscar();
             if (message.Contains("Error"))
-                MessageBox.Show(message);
+                MessageBox.Show(message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
 
             foreach (TurnoEstadoDTO temp in list)
             {
